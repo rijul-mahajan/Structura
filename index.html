@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Structura – DSA Visualizer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{color-scheme:dark;--bg:#09090b;--pn:#101013;--rs:#17171b;--hv:#1e1e24;--sg:#2a2a32;--bd:#24242b;--bd2:#33333c;--tx:#f4f4f5;--tx2:#a1a1aa;--mu:#71717a;--ac:#7480ff;--acs:rgba(116,128,255,.13);--amber:#f5a524;--red:#f0605d;--green:#34d399;--vio:#a78bfa;--idle:#2e2e37;--sans:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;--mono:"JetBrains Mono",ui-monospace,"SF Mono",Menlo,Consolas,monospace;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+:root[data-theme="light"]{color-scheme:light;--bg:#fafafa;--pn:#fff;--rs:#f4f4f6;--hv:#ebebef;--sg:#fff;--bd:#e6e6ea;--bd2:#d4d4da;--tx:#17171a;--tx2:#55555f;--mu:#8a8a96;--ac:#4a55e8;--acs:rgba(74,85,232,.1);--amber:#d98a04;--red:#dc3b38;--green:#13a06d;--vio:#7c5cf0;--idle:#d9d9e0}
+html{scroll-padding-top:env(safe-area-inset-top,0px);height:100%}
+*{box-sizing:border-box;scrollbar-width:thin;scrollbar-color:var(--bd2) transparent}
+body{margin:0;min-height:100%;background:var(--bg);color:var(--tx);font:14px/1.5 var(--sans);letter-spacing:-.006em;-webkit-font-smoothing:antialiased;font-feature-settings:"cv11","ss03"}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--bg);z-index:20}
+svg{flex:none}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:10;display:flex;align-items:center;justify-content:space-between;height:52px;padding:0 20px;background:color-mix(in srgb,var(--bg) 85%,transparent);backdrop-filter:blur(12px);border-bottom:1px solid var(--bd)}
+.brand{display:flex;align-items:center;gap:10px;font-weight:600;letter-spacing:-.02em}
+.brand .sl,.brand .mu{color:var(--mu);font-weight:400}
+.hr{display:flex;gap:4px}
+.btn{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px;border:1px solid var(--bd);border-radius:8px;background:var(--rs);font-size:13px;font-weight:500;transition:background .15s,border-color .15s,transform .05s}
+.btn:hover{background:var(--hv);border-color:var(--bd2)}
+.btn:active,.ib:active,.play:active{transform:scale(.97)}
+.btn.pri{background:var(--tx);border-color:var(--tx);color:var(--bg)}
+.btn.pri:hover{opacity:.88}
+.ib{display:inline-grid;place-items:center;width:32px;height:32px;border:0;border-radius:8px;background:none;color:var(--tx2);transition:background .15s,color .15s,transform .05s}
+.ib:hover{background:var(--hv);color:var(--tx)}
+.app{display:grid;grid-template-columns:224px minmax(0,1fr)}
+.side{padding:12px;border-right:1px solid var(--bd)}
+.sec{padding:16px 10px 6px;font-size:12px;font-weight:500;color:var(--mu)}
+.sec:first-child{padding-top:4px}
+.nav{display:flex;align-items:center;gap:10px;width:100%;height:34px;padding:0 10px;border:0;border-radius:8px;background:none;color:var(--tx2);font-weight:500;text-align:left;transition:background .15s,color .15s}
+.nav:hover{background:var(--rs);color:var(--tx)}
+.nav.on{background:var(--hv);color:var(--tx)}
+.nav.on svg{color:var(--ac)}
+.main{display:flex;flex-direction:column;gap:16px;padding:24px;min-width:0;max-width:1120px}
+.hd{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap}
+h1{margin:0;font-size:24px;line-height:1.2;font-weight:600;letter-spacing:-.03em}
+.sub{margin:4px 0 0;color:var(--tx2)}
+.badge{display:inline-flex;align-items:center;gap:8px;height:28px;padding:0 10px;border:1px solid var(--bd);border-radius:8px;color:var(--mu);font-size:12px}
+.badge b{font:500 12px var(--mono);color:var(--tx)}
+.card{background:var(--pn);border:1px solid var(--bd);border-radius:12px;overflow:hidden}
+.ch{display:flex;align-items:center;gap:8px;height:40px;padding:0 14px;border-bottom:1px solid var(--bd);font-size:13px;font-weight:500;color:var(--tx2)}
+.ch .lang{margin-left:auto;font:400 11px var(--mono);color:var(--mu)}
+.note{padding:8px 16px 4px;font:12px/1.5 var(--sans);color:var(--mu);white-space:normal;border-top:1px solid var(--bd);margin-top:6px}.note code{font:inherit;font-family:var(--mono);color:var(--tx2)}
+.ch .seg{margin-left:auto}.ch .btn{height:28px;padding:0 10px;font-size:12px}.ch #fn{white-space:nowrap;min-width:0;overflow:hidden;text-overflow:ellipsis}.ch .seg button{padding:0 8px}
+.tools{display:flex;flex-wrap:wrap;gap:12px 24px;justify-content:space-between;align-items:flex-end;padding:14px}
+.grp{display:flex;flex-wrap:wrap;gap:8px;align-items:flex-end}
+.fld{display:flex;flex-direction:column;gap:5px;font-size:12px;font-weight:500;color:var(--mu)}
+input[type=text],input[type=number]{height:32px;padding:0 10px;border:1px solid var(--bd);border-radius:8px;background:var(--bg);color:var(--tx);font:13px var(--mono);transition:border-color .15s,box-shadow .15s}
+input[type=text]:hover,input[type=number]:hover{border-color:var(--bd2)}
+input[type=text]:focus,input[type=number]:focus{outline:0;border-color:var(--ac);box-shadow:0 0 0 3px var(--acs)}
+input[type=number]{width:80px;-moz-appearance:textfield}
+input::-webkit-inner-spin-button,input::-webkit-outer-spin-button{-webkit-appearance:none}
+#data{width:250px;max-width:100%}
+.seg{display:inline-flex;gap:2px;padding:2px;border:1px solid var(--bd);border-radius:10px;background:var(--rs)}
+.seg:empty{display:none}
+.seg button{height:26px;padding:0 10px;border:0;border-radius:8px;background:none;color:var(--tx2);font-size:13px;font-weight:500;transition:color .15s,background .15s}
+.seg button:hover{color:var(--tx)}
+.seg button.on{background:var(--sg);color:var(--tx);box-shadow:0 1px 2px rgba(0,0,0,.25)}
+.stage{height:300px;display:flex;padding:20px;overflow:auto;background-image:radial-gradient(var(--bd) 1px,transparent 1px);background-size:22px 22px}
+.stage>*{margin:auto}
+.legend{display:flex;flex-wrap:wrap;gap:6px 18px;padding:10px 14px;border-top:1px solid var(--bd);font-size:12px;color:var(--mu)}
+.legend i{display:inline-block;width:8px;height:8px;margin-right:6px;border-radius:50%;background:var(--c)}
+.cur,.cmp{--mc:var(--amber)}.swap,.del{--mc:var(--red)}.found,.sorted{--mc:var(--green)}.new,.pivot{--mc:var(--vio)}.mid,.ptr{--mc:var(--ac)}
+:is(.cur,.cmp,.swap,.del,.found,.sorted,.new,.pivot,.mid,.ptr){--mb:color-mix(in srgb,var(--mc) 14%,var(--rs))}
+.out{opacity:.3}
+.bars{display:flex;gap:8px;align-items:flex-end;height:250px;width:100%;max-width:660px}
+.bar{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:4px;transition:opacity .25s}
+.bar b{width:100%;border-radius:5px 5px 2px 2px;background:var(--mc,var(--idle));transition:height .35s cubic-bezier(.3,.8,.3,1),background .2s}
+.bar span{font:500 11px var(--mono);color:var(--tx2)}
+.bar em,.cell em{font:400 10px var(--mono);color:var(--mu);font-style:normal}
+.cells,.list,.stack{display:flex;align-items:center;gap:8px}
+.cell,.node span,.item{border:1px solid var(--mc,var(--bd2));background:var(--mb,var(--rs));border-radius:8px;font:500 14px var(--mono);transition:border-color .2s,background .2s}
+.cell,.node span{min-width:52px;height:52px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 10px;gap:1px}
+.node{display:flex;align-items:center;gap:8px;position:relative;animation:pop .25s}
+.node small,.item small,.cell small{position:absolute;padding:0 6px;border-radius:4px;background:var(--acs);color:var(--ac);font:500 10px/16px var(--mono)}
+.node small,.cell small{top:-22px;left:0;white-space:nowrap}.cell{position:relative}
+.item small{left:calc(100% + 10px);top:11px}
+.arr{display:grid;color:var(--mu)}.nul{font:12px var(--mono);color:var(--mu)}
+.list{flex-wrap:wrap;row-gap:30px;justify-content:center}
+.stack{flex-direction:column;width:180px;gap:6px}
+.item{position:relative;width:100%;height:40px;display:flex;align-items:center;justify-content:center;animation:pop .25s}
+.base{width:100%;height:3px;border-radius:2px;background:var(--bd2)}
+@keyframes pop{from{transform:scale(.85);opacity:0}}
+svg line{stroke:var(--bd2);stroke-width:1.5}
+.tn circle{fill:var(--mb,var(--rs));stroke:var(--mc,var(--bd2));stroke-width:1.5;transition:fill .2s,stroke .2s}
+.tn text{fill:var(--tx);font:500 13px var(--mono);text-anchor:middle}
+.empty{color:var(--mu)}
+.ctl{display:flex;flex-wrap:wrap;align-items:center;gap:12px 20px;padding:10px 14px}
+.tr{display:flex;align-items:center;gap:2px}
+.play{display:grid;place-items:center;width:38px;height:38px;margin:0 4px;border:0;border-radius:50%;background:var(--tx);color:var(--bg);transition:opacity .15s,transform .05s}
+.play:hover{opacity:.88}
+.play svg{fill:currentColor;stroke-width:1.5}
+.scr{flex:1;min-width:160px;display:flex;align-items:center;gap:12px}
+.cnt{min-width:54px;text-align:right;font:12px var(--mono);color:var(--mu)}
+input[type=range]{--p:0%;-webkit-appearance:none;appearance:none;width:100%;height:16px;margin:0;background:none;cursor:pointer}
+input[type=range]::-webkit-slider-runnable-track{height:4px;border-radius:2px;background:linear-gradient(90deg,var(--ac) var(--p),var(--bd2) var(--p))}
+input[type=range]::-moz-range-track{height:4px;border-radius:2px;background:var(--bd2)}
+input[type=range]::-moz-range-progress{height:4px;border-radius:2px;background:var(--ac)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;margin-top:-5px;border-radius:50%;border:2px solid var(--pn);background:var(--tx);box-shadow:0 0 0 1px var(--bd2)}
+input[type=range]::-moz-range-thumb{width:10px;height:10px;border-radius:50%;border:2px solid var(--pn);background:var(--tx);box-shadow:0 0 0 1px var(--bd2)}
+.low{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:16px}
+.say{padding:14px}
+.stp{display:inline-block;margin-bottom:6px;font:500 11px var(--mono);color:var(--ac)}
+#say{margin:0;font-size:15px;line-height:1.55;min-height:46px}
+.log{margin:0;padding:6px 0;list-style:none;max-height:190px;overflow:auto;position:relative;border-top:1px solid var(--bd)}
+.log li{display:flex;gap:10px;padding:5px 14px;color:var(--mu);font-size:13px;cursor:pointer;transition:background .15s}
+.log li:hover{background:var(--rs)}
+.log li.on{background:var(--rs);color:var(--tx)}
+.log li span{flex:none;width:20px;text-align:right;font:500 11px/20px var(--mono)}
+pre{margin:0;padding:10px 0;font:13px/1.7 var(--mono);overflow:auto}
+.ln{display:flex;padding-right:16px;white-space:pre}
+.ln.on{background:var(--acs)}
+.ln .t{flex:1;min-width:0;font:inherit;white-space:pre}
+.ln span{flex:none;width:40px;padding-right:14px;text-align:right;color:var(--mu);opacity:.7;user-select:none}
+.ln.on span{color:var(--ac);opacity:1}
+.st{color:var(--green);font-style:normal}.ty{color:var(--green);color:color-mix(in srgb,var(--green) 55%,var(--ac));font-style:normal}
+.k{color:var(--vio);font-style:normal}.n{color:var(--amber);font-style:normal}.f{color:var(--ac);font-style:normal}.c{color:var(--mu);font-style:normal}
+@media(max-width:900px){.app{grid-template-columns:1fr}.side{display:flex;gap:4px;overflow-x:auto;padding:10px;border-right:0;border-bottom:1px solid var(--bd)}.sec{display:none}.nav{width:auto;flex:none;white-space:nowrap}.low{grid-template-columns:1fr}.main{padding:16px}header{padding:0 14px}}
+.hash{display:flex;flex-direction:column;gap:6px}.row{display:flex;align-items:center;gap:8px;color:var(--mu)}.hash .cell{height:38px;min-width:46px}.row>.cell:first-child{background:var(--mb,var(--hv))}
+kbd{font:500 11px var(--mono);padding:1px 6px;border:1px solid var(--bd2);border-radius:5px;color:var(--mu);background:var(--bg)}
+#kb{margin-right:6px;color:var(--tx2)}#kb kbd{margin-left:6px}
+.hint{margin:0;color:var(--mu);font-size:12px}.hint kbd{margin:0 2px}
+#toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translate(-50%,12px);padding:8px 14px;border:1px solid var(--bd2);border-radius:10px;background:var(--hv);font-size:13px;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:60}#toast.on{opacity:1;transform:translate(-50%,0)}
+#pal{position:fixed;inset:0;z-index:50;display:flex;justify-content:center;align-items:flex-start;padding:12vh 16px;background:rgba(0,0,0,.5);backdrop-filter:blur(4px)}#pal[hidden]{display:none}
+.pbox{width:100%;max-width:480px;background:var(--pn);border:1px solid var(--bd2);border-radius:14px;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,.45)}
+#pq{width:100%;height:48px;padding:0 16px;border:0;border-bottom:1px solid var(--bd);border-radius:0;background:none;font:14px var(--sans)}#pq:focus{box-shadow:none;border-color:var(--bd)}
+#pl{list-style:none;margin:0;padding:6px;max-height:320px;overflow:auto}#pl li{display:flex;align-items:center;gap:10px;height:38px;padding:0 10px;border-radius:8px;cursor:pointer;color:var(--tx2)}#pl li.on{background:var(--hv);color:var(--tx)}#pl li b{font-weight:500}#pl li span{margin-left:auto;font-size:12px;color:var(--mu)}#pl .none{cursor:default;color:var(--mu)}
+@media(max-width:700px){#kb span,#kb kbd,.hint{display:none}}
+::view-transition-old(root),::view-transition-new(root){animation-duration:.35s;animation-timing-function:ease}
+.tt,.tt *,.tt *::before,.tt *::after{transition:background-color .3s ease,color .3s ease,border-color .3s ease,fill .3s ease,stroke .3s ease,box-shadow .3s ease,opacity .3s ease!important}
+.hp{display:flex;flex-direction:column;align-items:center;gap:12px}.mini{gap:4px}.mini .cell{min-width:34px;height:40px;padding:0 6px;font-size:12px}
+.gv{display:flex;flex-direction:column;align-items:center;gap:10px}.ge{transition:stroke .2s}.ge:is(.cur,.cmp,.swap,.del,.found,.sorted,.new,.pivot,.mid,.ptr){stroke:var(--mc);stroke-width:2.5}.gw{fill:var(--mu);font:11px var(--mono);text-anchor:middle}.tn .dl{fill:var(--ac);font:500 11px var(--mono)}
+.qs{display:flex;flex-wrap:wrap;gap:6px;align-items:center;min-height:26px;font:12px var(--mono);color:var(--mu)}.qs b{font-weight:500;margin-right:4px}.qs em{font-style:normal}.chip2{padding:1px 8px;border:1px solid var(--bd2);border-radius:6px;background:var(--rs);color:var(--tx)}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="color:var(--ac)"><circle cx="12" cy="5" r="2.5"/><circle cx="5" cy="19" r="2.5"/><circle cx="19" cy="19" r="2.5"/><path d="M10.5 7.2 6.5 16.8M13.5 7.2l4 9.6"/></svg>Structura<span class="sl">/</span><span class="mu">Visualizer</span></div>
+  <div class='hr'><button class='btn' id='kb' data-ic='search'><span>Search</span><kbd id='kk'>Ctrl K</kbd></button><button class='ib' id='snd' aria-label="Toggle sound" title="Sound effects"></button><button class="ib" id="theme" aria-label="Toggle theme" title="Toggle theme"></button></div>
+</header>
+<div class="app">
+  <nav class="side" id="nav" aria-label="Topics"></nav>
+  <main class="main">
+    <div class="hd"><div><h1 id="title"></h1><p class="sub" id="desc"></p></div><span class="badge">Complexity<b id="cx"></b></span></div>
+    <div class="card tools">
+      <div class="grp">
+        <label class="fld">Data<input type="text" id="data" placeholder="e.g. 7, 3, 9, 1" spellcheck="false"></label>
+        <button class="btn" id="set">Apply</button><button class='btn' id='rnd' data-ic='shuffle'>Shuffle</button><div class='seg' id='pre' aria-label='Input presets'><button data-p='random'>Random</button><button data-p='sorted'>Sorted</button><button data-p='reversed'>Reversed</button><button data-p='nearly'>Nearly sorted</button></div>
+      </div>
+      <div class="grp">
+        <div class="seg" id="ops"></div>
+        <label class="fld" id="lv">Value<input type="number" id="v" value="42"></label>
+        <label class="fld" id="li">Index<input type="number" id="i" value="0"></label>
+        <button class="btn pri" id="run" data-ic="play">Run</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="stage" id="stage"></div>
+      <div class="legend"><span><i style="--c:var(--amber)"></i>Comparing</span><span><i style="--c:var(--red)"></i>Swap / remove</span><span><i style="--c:var(--ac)"></i>Pointer</span><span><i style="--c:var(--vio)"></i>Pivot / new</span><span><i style="--c:var(--green)"></i>Sorted / found</span></div>
+    </div>
+    <div class="card ctl">
+      <div class="tr">
+        <button class="ib" id="rs" title="Reset (R)" aria-label="Reset" data-ic="rotate-ccw"></button>
+        <button class="ib" id="bk" title="Step back (←)" aria-label="Step back" data-ic="chevron-left"></button>
+        <button class="play" id="pp" title="Play / pause (Space)" aria-label="Play or pause"></button>
+        <button class="ib" id="fw" title="Step forward (→)" aria-label="Step forward" data-ic="chevron-right"></button>
+      </div>
+      <div class="scr"><input type="range" id="sc" min="0" max="0" value="0" aria-label="Timeline"><span class="cnt" id="cnt"></span></div>
+      <div class="seg" id="spd" role="group" aria-label="Speed"><button data-s="0.5">0.5×</button><button data-s="1" class="on">1×</button><button data-s="2">2×</button><button data-s="4">4×</button></div>
+    </div>
+    <div class="low">
+      <div class="card"><div class="ch" data-ic="message">Explanation</div><div class="say"><span class="stp" id="stp"></span><p id="say"></p></div><ol class="log" id="log"></ol></div>
+      <div class="card"><div class="ch" data-ic="code"><span id="fn">code.js</span><div class="seg" id="lg" role="group" aria-label="Language"></div><button class="btn" id="cp" title="Copy code" aria-label="Copy code">Copy</button></div><pre id="code"></pre></div>
+    </div>
+  </main>
+</div>
+<script>
+"use strict";
+const $=s=>document.querySelector(s),clone=o=>JSON.parse(JSON.stringify(o));
+const esc=s=>String(s).replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+const HLX={
+ js:{c:"\\/\\/.*$",k:"function|let|const|return|if|else|for|while|new|break|throw|continue|of",t:""},
+ py:{c:"#.*$",k:"def|return|if|elif|else|for|while|in|not|and|or|is|None|True|False|raise|break|continue",t:""},
+ cpp:{c:"\\/\\/.*$",k:"const|auto|return|if|else|for|while|new|break|throw|continue|nullptr|true|false",t:"void|int|bool|vector|set|queue|deque|pair"},
+ java:{c:"\\/\\/.*$",k:"static|return|if|else|for|while|new|break|throw|continue|null|true|false",t:"void|int|boolean"}},HLR={};
+const hl=(s,lg="js")=>{const d=HLX[lg]||HLX.js;
+  const r=HLR[lg]||(HLR[lg]=new RegExp(`(${d.c})|("[^"]*"|'[^']*')|\\b(${d.k})\\b|\\b(${d.t||"(?!)"})\\b|\\b(\\d+)\\b|\\b([A-Za-z_]\\w*)(?=\\()|\\b([A-Z][a-z]\\w*)\\b`,"g"));
+  return esc(s).replace(r,(m,c,st,k,t,n,f,T)=>c?`<i class=c>${c}</i>`:st?`<i class=st>${st}</i>`:k?`<i class=k>${k}</i>`:(t||T)?`<i class=ty>${t||T}</i>`:n?`<i class=n>${n}</i>`:`<i class=f>${f}</i>`)};
+const rec=()=>{const f=[];return[f,(d,m,ln,t)=>f.push({d:clone(d),m:m||{},ln,t})]};
+const bad=(s,t)=>({f:[{d:clone(s),m:{},ln:-1,t}]});
+/* ---------- icons (Lucide-style, stroke) ---------- */
+const P={"play":'<polygon points="6 3 20 12 6 21 6 3"/>',"pause":'<rect x="14" y="4" width="4" height="16" rx="1"/><rect x="6" y="4" width="4" height="16" rx="1"/>',"rotate-ccw":'<path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/>',"chevron-left":'<path d="m15 18-6-6 6-6"/>',"chevron-right":'<path d="m9 18 6-6-6-6"/>',"arrow-right":'<path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>',"sun":'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>',"moon":'<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>',"volume-2":'<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>',"volume-x":'<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="22" x2="16" y1="9" y2="15"/><line x1="16" x2="22" y1="9" y2="15"/>',"shuffle":'<path d="M2 18h1.4c1.3 0 2.5-.6 3.3-1.7l6.1-8.6c.7-1.1 2-1.7 3.3-1.7H22"/><path d="m18 2 4 4-4 4"/><path d="M2 6h1.9c1.5 0 2.9.9 3.6 2.2"/><path d="M22 18h-5.9c-1.3 0-2.6-.7-3.3-1.8l-.5-.8"/><path d="m18 14 4 4-4 4"/>',"brackets":'<path d="M16 3h3v18h-3"/><path d="M8 21H5V3h3"/>',"link":'<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>',"layers":'<path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/><path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65"/><path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"/>',"network":'<rect x="9" y="2" width="6" height="6" rx="1"/><rect x="2" y="16" width="6" height="6" rx="1"/><rect x="16" y="16" width="6" height="6" rx="1"/><path d="M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3M12 12V8"/>',"search":'<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>',"arrows":'<path d="m21 16-4 4-4-4"/><path d="M17 20V4"/><path d="m3 8 4-4 4 4"/><path d="M7 4v16"/>',"zap":'<path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/>',"code":'<path d="m16 18 6-6-6-6"/><path d="m8 6-6 6 6 6"/>',"message":'<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>'};
+const ic=(n,s=16)=>`<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${P[n]}</svg>`;
+const IC={array:'brackets',list:'link',stack:'layers',tree:'network',bsearch:'search',bubble:'arrows',quick:'zap',queue:'queue',hash:'hash',selection:'target',insertion:'download',merge:'merge',heap:'triangle',deque:'swap',bfs:'share',dfs:'branch',dijkstra:'route',heapsort:'triangle',shell:'arrows',linear:'search'};
+Object.assign(P,{queue:'<path d="M3 6h13M3 12h13M3 18h13"/><path d="m19 9 3 3-3 3"/>',hash:'<path d="M4 9h16M4 15h16M10 3 8 21M16 3l-2 18"/>',target:'<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>',download:'<path d="M12 17V3"/><path d="m6 11 6 6 6-6"/><path d="M19 21H5"/>',merge:'<circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M6 21V9a9 9 0 0 0 9 9"/>'});
+const hf=v=>Math.round(v)%5;
+Object.assign(P,{triangle:'<path d="M12 3 3 20h18z"/>',swap:'<path d="M8 3 4 7l4 4"/><path d="M4 7h16"/><path d="m16 21 4-4-4-4"/><path d="M20 17H4"/>',share:'<circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/>',branch:'<path d="M6 3v12"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 0 1-9 9"/>',route:'<circle cx="6" cy="19" r="3"/><path d="M9 19h8.5a3.5 3.5 0 0 0 0-7h-11a3.5 3.5 0 0 1 0-7H15"/><circle cx="18" cy="5" r="3"/>'});
+const hpush=(h,v)=>{h.push(v);let i=h.length-1;while(i>0){const q=(i-1)>>1;if(h[q]<=h[i])break;[h[i],h[q]]=[h[q],h[i]];i=q}return h};
+const GN=[[50,105],[150,40],[150,170],[260,40],[260,170],[365,75],[365,140]],GE=[[0,1,4],[0,2,2],[1,2,1],[1,3,5],[2,4,3],[3,4,2],[3,5,2],[4,6,6],[5,6,1]];
+const ADJ=()=>{const a=GN.map(()=>[]);GE.forEach(([x,y,w],i)=>{a[x].push([y,i,w]);a[y].push([x,i,w])});a.forEach(l=>l.sort((x,y)=>x[0]-y[0]));return a};
+const DQ=(k,label,front,add)=>({k,label,args:add?'v':'',cx:'O(1)',code:add?[`function ${k}(dq, v) {`,`  dq.${front?'unshift':'push'}(v);   // ${front?'front':'back'} end`,`}`]:[`function ${k}(dq) {`,`  return dq.${front?'shift':'pop'}();   // ${front?'front':'back'} end`,`}`],
+  gen(s,{v}){const[f,p]=rec(),a=[...s.q],i=front?0:a.length-1;
+   if(add){if(a.length>=8)return bad(s,'Deque is full (demo limit: 8).');front?a.unshift(v):a.push(v);const j=front?0:a.length-1;p({q:a},{[j]:'new'},1,`${v} is added at the ${front?'front':'back'} in O(1).`);return{f,s:{q:a}}}
+   if(!a.length)return bad(s,'Deque is empty.');p(s,{[i]:'del'},1,`Remove ${a[i]} from the ${front?'front':'back'} end.`);const x=front?a.shift():a.pop();p({q:a},{},1,`Removed ${x}.`);return{f,s:{q:a}}}});
+
+/* ---------- renderers: (data, marks) -> html ---------- */
+const VIEWS={
+  bars:(d,m)=>{const mx=Math.max(...d.a.map(Math.abs),1);return`<div class=bars>${d.a.map((x,i)=>`<div class="bar ${m[i]||""}"><span>${x}</span><b style="height:${Math.max(8,Math.abs(x)/mx*170)}px"></b><em>${i}</em></div>`).join("")}</div>`},
+  cells:(d,m)=>`<div class=cells>${d.a.map((x,i)=>`<div class="cell ${m[i]||""}">${x===null?"":x}<em>${i}</em></div>`).join("")||'<p class=empty>Empty array</p>'}</div>`,
+  list:(d,m)=>d.l.length?`<div class=list>${d.l.map((x,i)=>`<div class="node ${m[i]||""}">${i===0?"<small>HEAD</small>":""}<span>${x}</span><b class=arr>${ic("arrow-right")}</b></div>`).join("")}<span class=nul>null</span></div>`:'<p class=empty>Empty list (head = null)</p>',
+  stack:(d,m)=>`<div class=stack>${d.s.map((x,i)=>`<div class="item ${m[i]||""}">${x}${i===d.s.length-1?"<small>TOP</small>":""}</div>`).reverse().join("")||'<p class=empty>Empty stack</p>'}<div class=base></div></div>`,
+  queue:(d,m)=>`<div class='cells'>${d.q.map((x,i,r)=>`<div class='cell ${m[i]||''}'>${i===0&&r.length===1?'<small>FRONT · REAR</small>':i===0?'<small>FRONT</small>':i===r.length-1?'<small>REAR</small>':''}${x}<em>${i}</em></div>`).join('')||'<p class=empty>Empty queue</p>'}</div>`,
+  hash:(d,m)=>`<div class='hash'>${d.h.map((b,i)=>`<div class='row'><div class='cell ${m['b'+i]||''}'>${i}</div>${b.map((x,j)=>`${ic('arrow-right',14)}<div class='cell ${m[i+'-'+j]||''}'>${x}</div>`).join('')||'<span class=nul>empty</span>'}</div>`).join('')}</div>`,
+  heap:(d,m)=>{const a=d.h,n=a.length;if(!n)return'<p class=empty>Empty heap</p>';const D=Math.floor(Math.log2(n)),W=Math.pow(2,D)*52,H=D*56+52,pt=i=>{const l=Math.floor(Math.log2(i+1)),k=i+1-Math.pow(2,l);return{x:(k+.5)/Math.pow(2,l)*W,y:l*56+26}};let e='',g='';
+    a.forEach((v,i)=>{const q=pt(i);if(i){const r=pt((i-1)>>1);e+=`<line x1='${r.x}' y1='${r.y}' x2='${q.x}' y2='${q.y}'/>`}g+=`<g class='tn ${m[i]||''}'><circle cx='${q.x}' cy='${q.y}' r='19'/><text x='${q.x}' y='${q.y+5}'>${v}</text></g>`});
+    return`<div class='hp'><svg width='${W}' height='${H}' viewBox='0 0 ${W} ${H}' style='max-width:100%;height:auto'>${e}${g}</svg><div class='cells mini'>${a.map((v,i)=>`<div class='cell ${m[i]||''}'>${v}<em>${i}</em></div>`).join('')}</div></div>`},
+  graph:(d,m)=>{let e='',g='';GE.forEach(([a,b,w],i)=>{const A=GN[a],B=GN[b];e+=`<line class='ge ${m['e'+i]||''}' x1='${A[0]}' y1='${A[1]}' x2='${B[0]}' y2='${B[1]}'/><text class='gw' x='${(A[0]+B[0])/2}' y='${(A[1]+B[1])/2-6}'>${w}</text>`});
+    GN.forEach(([x,y],i)=>{g+=`<g class='tn ${m[i]||''}'><circle cx='${x}' cy='${y}' r='19'/><text x='${x}' y='${y+5}'>${i}</text>${d.t&&d.t[i]!==undefined?`<text class='dl' x='${x}' y='${y-26}'>${d.t[i]}</text>`:''}</g>`});
+    return`<div class='gv'><svg width='420' height='205' viewBox='0 0 420 205' style='max-width:100%;height:auto'>${e}${g}</svg><div class='qs'>${d.q?`<b>${d.ql}</b>${d.q.map(x=>`<span class='chip2'>${x}</span>`).join('')||'<em>empty</em>'}`:''}</div></div>`},
+  tree:(d,m)=>{if(!d.t)return'<p class=empty>Empty tree</p>';const ps=[];let c=0,h=0;
+    (function w(n,y){if(!n)return;w(n.l,y+1);ps.push({n,x:++c,y});h=Math.max(h,y);w(n.r,y+1)})(d.t,0);
+    const PM=new Map(ps.map(o=>[o.n.v,o]));let e="",g="";
+    ps.forEach(({n,x,y})=>{[n.l,n.r].forEach(ch=>{if(ch){const q=PM.get(ch.v);e+=`<line x1="${x*48}" y1="${y*64+30}" x2="${q.x*48}" y2="${q.y*64+30}"/>`}});
+      g+=`<g class="tn ${m[n.v]||""}"><circle cx="${x*48}" cy="${y*64+30}" r="20"/><text x="${x*48}" y="${y*64+35}">${n.v}</text></g>`});
+    return`<svg width="${(c+1)*48}" height="${h*64+62}" viewBox="0 0 ${(c+1)*48} ${h*64+62}" style="max-width:100%;height:auto">${e}${g}</svg>`}
+};
+
+/* ---------- catalog: add an entry here to add a structure/algorithm ---------- */
+const ins=(t,v)=>{if(!t)return{v,l:null,r:null};if(v<t.v)t.l=ins(t.l,v);else if(v>t.v)t.r=ins(t.r,v);return t};
+const ITEMS=[
+{id:"array",g:"Data structures",name:"Array",view:"cells",desc:"Contiguous memory with O(1) index access.",init:[7,3,9,1,5],mk:n=>({a:n.slice(0,12)}),ops:[
+ {k:"insert",label:"Insert",args:"vi",cx:"Insert at index · O(n)",code:["function insert(arr, i, v) {","  for (let k = arr.length; k > i; k--)","    arr[k] = arr[k-1];   // shift right","  arr[i] = v;","}"],
+  gen(s,{v,i}){const[f,p]=rec(),a=[...s.a];if(a.length>=12)return bad(s,"Array is full (demo limit: 12).");i=Math.max(0,Math.min(a.length,i));
+   p({a},{},0,`Insert ${v} at index ${i}. Everything from index ${i} onward must shift right.`);a.push(null);
+   for(let k=a.length-1;k>i;k--){a[k]=a[k-1];p({a},{[k]:"cur",[k-1]:"cmp"},2,`Shift a[${k-1}] into a[${k}].`)}
+   a[i]=v;p({a},{[i]:"new"},3,`Write ${v} at index ${i}. Shifting made this O(n).`);return{f,s:{a}}}},
+ {k:"delete",label:"Delete",args:"i",cx:"Delete at index · O(n)",code:["function remove(arr, i) {","  for (let k = i; k < arr.length - 1; k++)","    arr[k] = arr[k+1];   // shift left","  arr.length--;","}"],
+  gen(s,{i}){const[f,p]=rec(),a=[...s.a];if(i<0||i>=a.length)return bad(s,`Index ${i} is out of range.`);
+   p({a},{[i]:"del"},0,`Remove index ${i} (value ${a[i]}). Later elements shift left to close the gap.`);
+   for(let k=i;k<a.length-1;k++){a[k]=a[k+1];p({a},{[k]:"cur",[k+1]:"cmp"},2,`Copy a[${k+1}] into a[${k}].`)}
+   a.pop();p({a},{},3,"Shrink the length by one.");return{f,s:{a}}}},
+ {k:"update",label:"Update",args:"vi",cx:"Write at index · O(1)",code:["function update(arr, i, v) {","  arr[i] = v;   // direct access","}"],
+  gen(s,{v,i}){const[f,p]=rec(),a=[...s.a];if(i<0||i>=a.length)return bad(s,`Index ${i} is out of range.`);
+   p({a},{[i]:"cur"},0,`Jump straight to index ${i}.`);a[i]=v;p({a},{[i]:"new"},1,`Overwrite with ${v}. Random access is O(1).`);return{f,s:{a}}}},
+ {k:"search",label:"Linear search",args:"v",cx:"Scan · O(n)",code:["function indexOf(arr, v) {","  for (let i = 0; i < arr.length; i++)","    if (arr[i] === v) return i;","  return -1;","}"],
+  gen(s,{v}){const[f,p]=rec(),a=s.a;for(let i=0;i<a.length;i++){p(s,{[i]:"cmp"},2,`Is a[${i}] = ${a[i]} equal to ${v}?`);
+   if(a[i]===v){p(s,{[i]:"found"},2,`Yes — found ${v} at index ${i}.`);return{f}}}
+   p(s,{},3,`Reached the end: ${v} is not present → -1.`);return{f}}}]},
+
+{id:"list",g:"Data structures",name:"Linked List",view:"list",desc:"Nodes linked by pointers; cheap head insertion.",init:[4,8,15,16],mk:n=>({l:n.slice(0,10)}),ops:[
+ {k:"head",label:"Insert head",args:"v",cx:"O(1)",code:["function insertHead(list, v) {","  const node = new Node(v);","  node.next = list.head;","  list.head = node;","}"],
+  gen(s,{v}){const[f,p]=rec(),l=[...s.l];if(l.length>=10)return bad(s,"List is full (demo limit: 10).");
+   p(s,{},1,`Create a new node holding ${v}.`);l.unshift(v);p({l},{0:"new"},2,"Point the new node at the old head.");p({l},{0:"new"},3,"Move head to the new node. No traversal needed — O(1).");return{f,s:{l}}}},
+ {k:"tail",label:"Insert tail",args:"v",cx:"O(n) without a tail pointer",code:["function insertTail(list, v) {","  const node = new Node(v);","  if (!list.head) { list.head = node; return; }","  let cur = list.head;","  while (cur.next) cur = cur.next;","  cur.next = node;","}"],
+  gen(s,{v}){const[f,p]=rec(),l=[...s.l];if(l.length>=10)return bad(s,"List is full (demo limit: 10).");
+   p(s,{},1,`Create a new node holding ${v}.`);if(!l.length){l.push(v);p({l},{0:"new"},2,"The list is empty, so the new node simply becomes the head.");return{f,s:{l}}}
+   for(let i=0;i<l.length;i++)p(s,{[i]:"cur"},4,`Walk forward: at node ${l[i]}${i<l.length-1?", it has a next node":", next is null — this is the tail"}.`);
+   l.push(v);p({l},{[l.length-1]:"new"},5,`Link the tail to the new node.`);return{f,s:{l}}}},
+ {k:"del",label:"Delete value",args:"v",cx:"O(n)",code:["function remove(list, v) {","  let cur = list.head, prev = null;","  while (cur && cur.val !== v) { prev = cur; cur = cur.next; }","  if (!cur) return;","  if (prev) prev.next = cur.next;","  else list.head = cur.next;","}"],
+  gen(s,{v}){const[f,p]=rec(),l=[...s.l];for(let i=0;i<l.length;i++){
+    if(l[i]===v){p(s,{[i]:"del"},2,`Found ${v}.`);l.splice(i,1);p({l},{},i?4:5,i?"Bypass it: prev.next = cur.next.":"It is the head: move head to the next node.");return{f,s:{l}}}
+    p(s,{[i]:"cur"},2,`${l[i]} ≠ ${v}; advance.`)}
+   p(s,{},3,`${v} is not in the list; nothing to delete.`);return{f}}},
+ {k:"find",label:"Search",args:"v",cx:"O(n)",code:["function find(list, v) {","  let cur = list.head;","  while (cur) {","    if (cur.val === v) return cur;","    cur = cur.next;","  }","  return null;","}"],
+  gen(s,{v}){const[f,p]=rec();for(let i=0;i<s.l.length;i++){p(s,{[i]:"cmp"},3,`Does ${s.l[i]} equal ${v}?`);if(s.l[i]===v){p(s,{[i]:"found"},3,`Match — found ${v} at position ${i}.`);return{f}}}
+   p(s,{},6,`Ran off the end: ${v} not found.`);return{f}}}]},
+
+{id:"stack",g:"Data structures",name:"Stack",view:"stack",desc:"Last in, first out (LIFO).",init:[3,6,9],mk:n=>({s:n.slice(0,8)}),ops:[
+ {k:"push",label:"Push",args:"v",cx:"O(1)",code:["function push(stack, v) {","  if (stack.length === MAX) throw new Error(\"overflow\");","  stack.push(v);   // new top","}"],
+  gen(s,{v}){const[f,p]=rec(),a=[...s.s];p(s,{},1,`Check capacity (${a.length}/8).`);if(a.length>=8){p(s,{[a.length-1]:"del"},1,"Stack overflow — capacity reached.");return{f}}
+   a.push(v);p({s:a},{[a.length-1]:"new"},2,`Push ${v} onto the top.`);return{f,s:{s:a}}}},
+ {k:"pop",label:"Pop",args:"",cx:"O(1)",code:["function pop(stack) {","  if (stack.length === 0) throw new Error(\"underflow\");","  return stack.pop();   // remove top","}"],
+  gen(s){const[f,p]=rec(),a=[...s.s];if(!a.length){p(s,{},1,"Stack underflow — nothing to pop.");return{f}}
+   p(s,{[a.length-1]:"del"},2,`Top element ${a[a.length-1]} is removed.`);const x=a.pop();p({s:a},{},2,`Popped ${x}. The new top is ${a.length?a[a.length-1]:"empty"}.`);return{f,s:{s:a}}}},
+ {k:"peek",label:"Peek",args:"",cx:"O(1)",code:["function peek(stack) {","  return stack[stack.length - 1];","}"],
+  gen(s){const[f,p]=rec();if(!s.s.length)p(s,{},1,"Stack is empty — there is no top element to read.");else p(s,{[s.s.length-1]:"found"},1,`Top is ${s.s[s.s.length-1]}. It was only read, not removed.`);return{f}}}]},
+
+{id:"tree",g:"Data structures",name:"Binary Tree (BST)",view:"tree",desc:"Binary search tree: smaller values left, larger right.",init:[50,30,70,20,40,60,80],mk:n=>({t:n.slice(0,15).reduce(ins,null)}),ops:[
+ {k:"insert",label:"Insert",args:"v",cx:"O(log n) avg · O(n) worst",code:["function insert(node, v) {","  if (!node) return new Node(v);","  if (v < node.val) node.left = insert(node.left, v);","  else if (v > node.val) node.right = insert(node.right, v);","  return node;","}"],
+  gen(s,{v}){const[f,p]=rec(),t=clone(s.t);if(!t){const n={v,l:null,r:null};p({t:n},{[v]:"new"},1,"Tree is empty: the new value becomes the root.");return{f,s:{t:n}}}
+   let c=t;const path={};for(;;){path[c.v]="cur";
+    if(v===c.v){p({t},path,4,`${v} already exists; BSTs ignore duplicates.`);return{f,s:{t}}}
+    const k=v<c.v?"l":"r";p({t},{...path},v<c.v?2:3,`${v} ${v<c.v?"<":">"} ${c.v} → go ${k==="l"?"left":"right"}.`);
+    if(!c[k]){c[k]={v,l:null,r:null};p({t},{...path,[v]:"new"},1,`Empty slot found: attach ${v} here.`);break}c=c[k]}
+   return{f,s:{t}}}},
+ {k:"search",label:"Search",args:"v",cx:"O(log n) avg · O(n) worst",code:["function search(node, v) {","  if (!node) return null;","  if (v === node.val) return node;","  return v < node.val","    ? search(node.left, v)","    : search(node.right, v);","}"],
+  gen(s,{v}){const[f,p]=rec();let c=s.t;const path={};while(c){path[c.v]="cur";
+    if(v===c.v){p(s,{...path,[v]:"found"},2,`${v} equals the current node — found.`);return{f}}
+    p(s,{...path},3,`${v} ${v<c.v?"<":">"} ${c.v} → go ${v<c.v?"left":"right"}.`);c=v<c.v?c.l:c.r}
+   p(s,path,1,`Reached an empty child: ${v} is not in the tree.`);return{f}}},
+ {k:"inorder",label:"In-order",args:"",cx:"O(n) · yields sorted order",code:["function inorder(node, out) {","  if (!node) return;","  inorder(node.left, out);","  out.push(node.val);","  inorder(node.right, out);","}"],
+  gen(s){const[f,p]=rec(),out=[],done={};const w=n=>{if(!n)return;p(s,{...done,[n.v]:"cur"},2,`At ${n.v}: visit the left subtree first.`);w(n.l);
+    out.push(n.v);done[n.v]="found";p(s,{...done},3,`Visit ${n.v}. Output so far: [${out.join(", ")}]`);if(n.r)p(s,{...done},4,`Now the right subtree of ${n.v}.`);w(n.r)};w(s.t);
+   p(s,{...done},5,`Done. Left → root → right gives sorted output: [${out.join(", ")}]`);return{f}}}]},
+
+{id:'queue',g:'Data structures',name:'Queue',view:'queue',desc:'First in, first out (FIFO).',init:[4,8,15],mk:n=>({q:n.slice(0,8)}),ops:[
+ {k:'enq',label:'Enqueue',args:'v',cx:'O(1)',code:[`function enqueue(q, v) {`,`  if (q.length === MAX) throw new Error('overflow');`,`  q.push(v);   // join at the rear`,`}`],
+  gen(s,{v}){const[f,p]=rec(),a=[...s.q];p(s,{},1,`Check capacity (${a.length}/8).`);if(a.length>=8){p(s,{[a.length-1]:'del'},1,'Queue overflow — capacity reached.');return{f}}a.push(v);p({q:a},{[a.length-1]:'new'},2,`${v} joins at the rear.`);return{f,s:{q:a}}}},
+ {k:'deq',label:'Dequeue',args:'',cx:'O(1)',code:[`function dequeue(q) {`,`  if (q.length === 0) throw new Error('underflow');`,`  return q.shift();   // leave from the front`,`}`],
+  gen(s){const[f,p]=rec(),a=[...s.q];if(!a.length){p(s,{},1,'Queue underflow — nothing to dequeue.');return{f}}p(s,{0:'del'},2,`Front element ${a[0]} leaves first (FIFO).`);const x=a.shift();p({q:a},{},2,`Dequeued ${x}. The new front is ${a.length?a[0]:'empty'}.`);return{f,s:{q:a}}}},
+ {k:'peek',label:'Peek',args:'',cx:'O(1)',code:[`function peek(q) {`,`  return q[0];`,`}`],
+  gen(s){const[f,p]=rec();if(!s.q.length)p(s,{},1,'Queue is empty — there is no front element to read.');else p(s,{0:'found'},1,`Front is ${s.q[0]}. It was only read, not removed.`);return{f}}}]},
+
+{id:'hash',g:'Data structures',name:'Hash Table',view:'hash',desc:'Integer keys map to a bucket with key mod 5 (keys must be ≥ 0); collisions chain together.',init:[12,7,25,3,17,9],mk:n=>{const h=[[],[],[],[],[]];n.slice(0,20).forEach(v=>{v=Math.round(v);if(v<0)return;const b=h[hf(v)];if(!b.includes(v))b.push(v)});return{h}},ops:[
+ {k:'ins',label:'Insert',args:'v',cx:'O(1) avg · O(n) worst',code:[`function insert(table, key) {`,`  const i = key % table.length;   // hash`,`  for (const k of table[i])`,`    if (k === key) return;        // already present`,`  table[i].push(key);             // chain it`,`}`],
+  gen(s,{v}){const[f,p]=rec(),h=clone(s.h);v=Math.round(v);if(v<0)return bad(s,"Hash keys must be non-negative integers.");const b=hf(v);p({h},{['b'+b]:'cur'},1,`hash(${v}) = ${v} mod 5 = ${b} → bucket ${b}.`);
+   for(let j=0;j<h[b].length;j++){p({h},{['b'+b]:'cur',[b+'-'+j]:'cmp'},3,`Compare ${v} with ${h[b][j]} in the chain.`);if(h[b][j]===v){p({h},{[b+'-'+j]:'found'},3,`${v} is already stored; no duplicate added.`);return{f}}}
+   h[b].push(v);p({h},{['b'+b]:'cur',[b+'-'+(h[b].length-1)]:'new'},4,h[b].length>1?`Collision! Chain ${v} onto bucket ${b}.`:`Bucket ${b} was empty; store ${v}.`);return{f,s:{h}}}},
+ {k:'find',label:'Search',args:'v',cx:'O(1) avg · O(n) worst',code:[`function has(table, key) {`,`  const i = key % table.length;`,`  for (const k of table[i])`,`    if (k === key) return true;`,`  return false;`,`}`],
+  gen(s,{v}){const[f,p]=rec(),h=s.h;v=Math.round(v);if(v<0)return bad(s,"Hash keys must be non-negative integers.");const b=hf(v);p(s,{['b'+b]:'cur'},1,`hash(${v}) = ${b}; only bucket ${b} needs checking.`);
+   for(let j=0;j<h[b].length;j++){p(s,{['b'+b]:'cur',[b+'-'+j]:'cmp'},3,`Is ${h[b][j]} equal to ${v}?`);if(h[b][j]===v){p(s,{[b+'-'+j]:'found'},3,`Found ${v} in bucket ${b}.`);return{f}}}
+   p(s,{['b'+b]:'cur'},4,`Chain exhausted: ${v} is not in the table.`);return{f}}},
+ {k:'del',label:'Delete',args:'v',cx:'O(1) avg · O(n) worst',code:[`function remove(table, key) {`,`  const i = key % table.length;`,`  const j = table[i].indexOf(key);`,`  if (j >= 0) table[i].splice(j, 1);`,`}`],
+  gen(s,{v}){const[f,p]=rec(),h=clone(s.h);v=Math.round(v);if(v<0)return bad(s,"Hash keys must be non-negative integers.");const b=hf(v);p({h},{['b'+b]:'cur'},1,`hash(${v}) = ${b}; look in bucket ${b}.`);
+   for(let j=0;j<h[b].length;j++){p({h},{['b'+b]:'cur',[b+'-'+j]:'cmp'},2,`Is ${h[b][j]} equal to ${v}?`);if(h[b][j]===v){p({h},{[b+'-'+j]:'del'},3,`Found ${v}; unlink it from the chain.`);h[b].splice(j,1);p({h},{['b'+b]:'cur'},3,`Removed ${v} from bucket ${b}.`);return{f,s:{h}}}}
+   p({h},{['b'+b]:'cur'},3,`${v} is not in the table; nothing to delete.`);return{f}}}]},
+
+{id:'heap',g:'Data structures',name:'Min Heap',view:'heap',desc:'A complete binary tree where every parent is no larger than its children.',init:[3,9,5,12,10,8,7],mk:n=>({h:n.slice(0,15).map(Math.round).reduce(hpush,[])}),ops:[
+ {k:'ins',label:'Insert',args:'v',cx:'O(log n)',code:[`function insert(h, v) {`,`  h.push(v);`,`  let i = h.length - 1;`,`  while (i > 0 && h[(i-1) >> 1] > h[i]) {`,`    swap(h, i, (i-1) >> 1);   // sift up`,`    i = (i-1) >> 1;`,`  }`,`}`],
+  gen(s,{v}){const[f,p]=rec(),h=[...s.h];if(h.length>=15)return bad(s,'Heap is full (demo limit: 15).');v=Math.round(v);h.push(v);let i=h.length-1;
+   p({h},{[i]:'new'},1,`Append ${v} at the next free slot (index ${i}) to keep the tree complete.`);
+   while(i>0){const q=(i-1)>>1;p({h},{[i]:'cmp',[q]:'cmp'},3,`Compare ${h[i]} with its parent ${h[q]}.`);
+    if(h[q]<=h[i]){p({h},{[i]:'found'},3,'Parent is not larger — heap property holds.');return{f,s:{h}}}
+    [h[i],h[q]]=[h[q],h[i]];p({h},{[i]:'swap',[q]:'swap'},4,`Swap: ${h[q]} moves up above ${h[i]}.`);i=q}
+   p({h},{0:'found'},3,'Reached the root — heap property holds.');return{f,s:{h}}}},
+ {k:'ext',label:'Extract min',args:'',cx:'O(log n)',code:[`function extractMin(h) {`,`  const min = h[0], last = h.pop();`,`  if (h.length === 0) return min;   // it was the only element`,`  h[0] = last;   // move the last element to the root`,`  let i = 0;`,`  while (true) {   // sift down`,`    const m = smallestOf(i, 2*i+1, 2*i+2);`,`    if (m === i) break;`,`    swap(h, i, m); i = m;`,`  }`,`  return min;`,`}`],
+  gen(s){const[f,p]=rec(),h=[...s.h];if(!h.length)return bad(s,'Heap is empty.');p({h},{0:'del'},1,`The minimum is always the root: ${h[0]}.`);
+   if(h.length===1){h.pop();p({h},{},2,'It was the only element.');return{f,s:{h}}}
+   h[0]=h.pop();let i=0;const n=h.length;p({h},{0:'new'},3,`Move the last element ${h[0]} to the root.`);
+   for(;;){const l=2*i+1,r=l+1;let m=i;if(l<n&&h[l]<h[m])m=l;if(r<n&&h[r]<h[m])m=r;
+    p({h},{[i]:'ptr',...(l<n?{[l]:'cmp'}:{}),...(r<n?{[r]:'cmp'}:{})},6,`Compare ${h[i]} with its children.`);
+    if(m===i){p({h},{[i]:'found'},7,`${h[i]} is no larger than its children — done.`);break}
+    [h[i],h[m]]=[h[m],h[i]];p({h},{[i]:'swap',[m]:'swap'},8,`Swap with the smaller child, ${h[i]}.`);i=m}
+   p({h},{},10,`Return ${s.h[0]}, the removed minimum.`);return{f,s:{h}}}},
+ {k:'peek',label:'Peek',args:'',cx:'O(1)',code:[`function peek(h) {`,`  return h[0];   // smallest element`,`}`],
+  gen(s){const[f,p]=rec();if(!s.h.length)p(s,{},1,'Heap is empty.');else p(s,{0:'found'},1,`The minimum is ${s.h[0]}, read in O(1).`);return{f}}}]},
+
+{id:'deque',g:'Data structures',name:'Deque',view:'queue',desc:'Double-ended queue: add or remove at either end.',init:[3,6,9],mk:n=>({q:n.slice(0,8)}),ops:[DQ('pushFront','Push front',1,1),DQ('pushBack','Push back',0,1),DQ('popFront','Pop front',1,0),DQ('popBack','Pop back',0,0)]},
+
+{id:'linear',g:'Algorithms',name:'Linear Search',view:'bars',algo:1,desc:'Check each element in turn. Works on unsorted data.',init:[14,3,27,9,21,5,18,32],mk:n=>({a:n.slice(0,16)}),ops:[
+ {k:'run',label:'Run',args:'v',vl:'Target',vd:21,cx:'O(n)',code:[`function linearSearch(a, target) {`,`  for (let i = 0; i < a.length; i++)`,`    if (a[i] === target) return i;`,`  return -1;`,`}`],
+  gen(s,{v}){const[f,p]=rec(),a=[...s.a],m={};for(let i=0;i<a.length;i++){p({a},{...m,[i]:'cmp'},2,`Is a[${i}] = ${a[i]} equal to ${v}?`);if(a[i]===v){p({a},{...m,[i]:'found'},2,`Yes — found ${v} at index ${i}.`);return{f}}m[i]='out'}
+   p({a},m,3,`Checked every element: ${v} is not present → -1.`);return{f}}}]},
+
+{id:"bsearch",g:"Algorithms",name:"Binary Search",view:"bars",algo:1,desc:"Halve the search range each step (input is sorted automatically).",init:[2,5,8,12,16,23,38,56,72,91],mk:n=>({a:n.slice(0,16)}),ops:[
+ {k:"run",label:"Run",args:"v",vl:"Target",vd:23,cx:"O(log n)",code:["function binarySearch(a, target) {","  let lo = 0, hi = a.length - 1;","  while (lo <= hi) {","    const mid = lo + ((hi - lo) >> 1);","    if (a[mid] === target) return mid;","    if (a[mid] < target) lo = mid + 1;","    else hi = mid - 1;","  }","  return -1;","}"],
+  gen(s,{v}){const[f,p]=rec(),a=[...s.a].sort((x,y)=>x-y);let lo=0,hi=a.length-1;
+   const mk=(o,l,h)=>{const m={};for(let i=0;i<a.length;i++)if(i<l||i>h)m[i]="out";return Object.assign(m,o)};
+   p({a},{},1,`Input sorted. Searching for ${v}: lo = 0, hi = ${hi}.`);
+   while(lo<=hi){const mid=(lo+hi)>>1;p({a},mk({[mid]:"mid"},lo,hi),3,`lo=${lo}, hi=${hi} → mid=${mid}, a[mid]=${a[mid]}.`);
+    if(a[mid]===v){p({a},mk({[mid]:"found"},lo,hi),4,`a[${mid}] equals ${v} — found at index ${mid}.`);return{f}}
+    if(a[mid]<v){lo=mid+1;p({a},mk({},lo,hi),5,`${a[mid]} < ${v}: discard the left half, lo = ${lo}.`)}
+    else{hi=mid-1;p({a},mk({},lo,hi),6,`${a[mid]} > ${v}: discard the right half, hi = ${hi}.`)}}
+   p({a},mk({},1,0),8,`lo > hi: ${v} is not in the array → -1.`);return{f}}}]},
+
+{id:"bubble",g:"Algorithms",name:"Bubble Sort",view:"bars",algo:1,desc:"Repeatedly swap adjacent out-of-order pairs.",init:[6,2,9,4,7,1,8,3],mk:n=>({a:n.slice(0,16)}),ops:[
+ {k:"run",label:"Run",args:"",cx:"O(n²) · O(n) if already sorted",code:["function bubbleSort(a) {","  for (let i = 0; i < a.length - 1; i++) {","    let swapped = false;","    for (let j = 0; j < a.length - 1 - i; j++) {","      if (a[j] > a[j+1]) {","        [a[j], a[j+1]] = [a[j+1], a[j]];","        swapped = true;","      }","    }","    if (!swapped) break;","  }","}"],
+  gen(s){const[f,p]=rec(),a=[...s.a],n=a.length,done=new Set(),mk=o=>{const m={};done.forEach(i=>m[i]="sorted");return Object.assign(m,o)};
+   for(let i=0;i<n-1;i++){let sw=false;
+    for(let j=0;j<n-1-i;j++){p({a},mk({[j]:"cmp",[j+1]:"cmp"}),4,`Compare a[${j}]=${a[j]} with a[${j+1}]=${a[j+1]}.`);
+     if(a[j]>a[j+1]){[a[j],a[j+1]]=[a[j+1],a[j]];sw=true;p({a},mk({[j]:"swap",[j+1]:"swap"}),5,`${a[j+1]} > ${a[j]}: swap them.`)}}
+    done.add(n-1-i);p({a},mk(),9,`Pass ${i+1} complete: index ${n-1-i} now holds its final value.`);
+    if(!sw){p({a},mk(),9,"No swaps in this pass — already sorted. Stop early.");break}}
+   for(let k=0;k<n;k++)done.add(k);p({a},mk(),11,"Sorted!");return{f}}}]},
+
+{id:"quick",g:"Algorithms",name:"Quicksort",view:"bars",algo:1,desc:"Partition around a pivot, then sort each side recursively.",init:[8,3,7,1,9,4,6,2,5],mk:n=>({a:n.slice(0,16)}),ops:[
+ {k:"run",label:"Run",args:"",cx:"O(n log n) avg · O(n²) worst",code:["function quickSort(a, lo = 0, hi = a.length - 1) {","  if (lo >= hi) return;","  const p = a[hi];","  let i = lo;","  for (let j = lo; j < hi; j++) {","    if (a[j] < p) { swap(a, i, j); i++; }","  }","  swap(a, i, hi);   // pivot in place","  quickSort(a, lo, i - 1);","  quickSort(a, i + 1, hi);","}"],
+  gen(s){const[f,p]=rec(),a=[...s.a],done=new Set(),mk=o=>{const m={};done.forEach(i=>m[i]="sorted");return Object.assign(m,o)};
+   const out=(lo,hi,m)=>{for(let i=0;i<a.length;i++)if((i<lo||i>hi)&&!done.has(i))m[i]="out";return m};
+   const qs=(lo,hi)=>{if(lo>=hi){if(lo===hi)done.add(lo);p({a},mk(),1,`Range [${lo}..${hi}] has at most one element — nothing to do.`);return}
+    const pv=a[hi];let i=lo;p({a},out(lo,hi,mk({[hi]:"pivot"})),2,`Sub-array [${lo}..${hi}]: pick the last element, ${pv}, as pivot.`);
+    for(let j=lo;j<hi;j++){p({a},out(lo,hi,mk({[hi]:"pivot",[i]:"ptr",[j]:"cmp"})),5,`Compare a[${j}]=${a[j]} with pivot ${pv}.`);
+     if(a[j]<pv){if(i!==j){[a[i],a[j]]=[a[j],a[i]];p({a},out(lo,hi,mk({[hi]:"pivot",[i]:"swap",[j]:"swap"})),5,`${a[i]} < ${pv}: swap it into the left partition (index ${i}).`)}i++}}
+    [a[i],a[hi]]=[a[hi],a[i]];done.add(i);p({a},out(lo,hi,mk()),7,`Put pivot ${pv} at index ${i} — its final position.`);qs(lo,i-1);qs(i+1,hi)};
+   qs(0,a.length-1);p({a},mk(),10,"Sorted!");return{f}}}]},
+
+{id:'selection',g:'Algorithms',name:'Selection Sort',view:'bars',algo:1,desc:'Repeatedly pick the smallest remaining value and place it next.',init:[7,3,9,1,5,8,2,6],mk:n=>({a:n.slice(0,16)}),ops:[
+ {k:'run',label:'Run',args:'',cx:'O(n²) · at most n−1 swaps',code:[`function selectionSort(a) {`,`  for (let i = 0; i < a.length - 1; i++) {`,`    let min = i;`,`    for (let j = i + 1; j < a.length; j++)`,`      if (a[j] < a[min]) min = j;`,`    [a[i], a[min]] = [a[min], a[i]];`,`  }`,`}`],
+  gen(s){const[f,p]=rec(),a=[...s.a],n=a.length,d=new Set(),mk=o=>{const m={};d.forEach(i=>m[i]='sorted');return Object.assign(m,o)};
+   for(let i=0;i<n-1;i++){let mn=i;p({a},mk({[i]:'ptr'}),2,`Pass ${i+1}: assume a[${i}]=${a[i]} is the minimum.`);
+    for(let j=i+1;j<n;j++){p({a},mk({[i]:'ptr',[mn]:'pivot',[j]:'cmp'}),4,`Is a[${j}]=${a[j]} smaller than the current minimum ${a[mn]}?`);if(a[j]<a[mn]){mn=j;p({a},mk({[i]:'ptr',[mn]:'pivot'}),4,`New minimum: ${a[mn]} at index ${mn}.`)}}
+    if(mn!==i){[a[i],a[mn]]=[a[mn],a[i]];p({a},mk({[i]:'swap',[mn]:'swap'}),5,`Swap the minimum ${a[i]} into index ${i}.`)}
+    d.add(i);p({a},mk(),5,`Index ${i} is now final.`)}
+   for(let k=0;k<n;k++)d.add(k);p({a},mk(),7,'Sorted!');return{f}}}]},
+
+{id:'insertion',g:'Algorithms',name:'Insertion Sort',view:'bars',algo:1,desc:'Grow a sorted prefix by inserting each value where it belongs.',init:[6,2,9,4,7,1,8,3],mk:n=>({a:n.slice(0,16)}),ops:[
+ {k:'run',label:'Run',args:'',cx:'O(n²) · O(n) if nearly sorted',code:[`function insertionSort(a) {`,`  for (let i = 1; i < a.length; i++) {`,`    const key = a[i];`,`    let j = i - 1;`,`    while (j >= 0 && a[j] > key) {`,`      a[j+1] = a[j]; j--;`,`    }`,`    a[j+1] = key;`,`  }`,`}`],
+  gen(s){const[f,p]=rec(),a=[...s.a],n=a.length,mk=(c,o)=>{const m={};for(let x=0;x<c;x++)m[x]='sorted';return Object.assign(m,o)};
+   for(let i=1;i<n;i++){const key=a[i];let j=i-1;p({a},mk(i,{[i]:'pivot'}),2,`Pick key ${key} and insert it into the sorted prefix [0..${i-1}].`);
+    while(j>=0&&a[j]>key){a[j+1]=a[j];p({a},mk(i+1,{[j]:'cmp',[j+1]:'swap'}),5,`${a[j]} > ${key}: shift it one place right.`);j--}
+    a[j+1]=key;p({a},mk(i+1,{[j+1]:'new'}),7,`Drop ${key} into index ${j+1}.`)}
+   p({a},mk(n,{}),9,'Sorted!');return{f}}}]},
+
+{id:'merge',g:'Algorithms',name:'Merge Sort',view:'bars',algo:1,desc:'Split in halves, sort each, then merge the sorted halves.',init:[8,3,7,1,9,4,6,2],mk:n=>({a:n.slice(0,16)}),ops:[
+ {k:'run',label:'Run',args:'',cx:'O(n log n) always · O(n) extra space',code:[`function mergeSort(a, lo = 0, hi = a.length - 1) {`,`  if (lo >= hi) return;`,`  const mid = lo + ((hi - lo) >> 1);`,`  mergeSort(a, lo, mid);`,`  mergeSort(a, mid + 1, hi);`,`  merge(a, lo, mid, hi);   // two-pointer merge`,`}`],
+  gen(s){const[f,p]=rec(),a=[...s.a],n=a.length,out=(lo,hi,m)=>{for(let i=0;i<n;i++)if(i<lo||i>hi)m[i]='out';return m};
+   const ms=(lo,hi)=>{if(lo>=hi)return;const mid=(lo+hi)>>1;p({a},out(lo,hi,{}),2,`Split [${lo}..${hi}] at index ${mid}.`);ms(lo,mid);ms(mid+1,hi);
+    const L=a.slice(lo,mid+1),R=a.slice(mid+1,hi+1);let i=0,j=0,k=lo;p({a},out(lo,hi,{}),5,`Merge sorted halves [${lo}..${mid}] and [${mid+1}..${hi}].`);
+    while(i<L.length||j<R.length){let x;
+     if(i<L.length&&j<R.length){p({a},out(lo,hi,{[k]:'cmp'}),5,`Compare ${L[i]} (left) with ${R[j]} (right).`);x=L[i]<=R[j]?L[i++]:R[j++]}else x=i<L.length?L[i++]:R[j++];
+     a[k]=x;p({a},out(lo,hi,{[k]:'new'}),5,`Write ${x} to index ${k}.`);k++}};
+   ms(0,n-1);const m={};for(let i=0;i<n;i++)m[i]='sorted';p({a},m,6,'Sorted!');return{f}}}]},
+
+{id:'heapsort',g:'Algorithms',name:'Heap Sort',view:'bars',algo:1,desc:'Build a max-heap, then repeatedly move the largest value to the end.',init:[4,10,3,5,1,8,7,2],mk:n=>({a:n.slice(0,16)}),ops:[
+ {k:'run',label:'Run',args:'',cx:'O(n log n) always · in place',code:[`function heapSort(a) {`,`  buildMaxHeap(a);`,`  for (let end = a.length - 1; end > 0; end--) {`,`    swap(a, 0, end);          // max goes to the back`,`    siftDown(a, 0, end);      // restore the heap`,`  }`,`}`],
+  gen(s){const[f,p]=rec(),a=[...s.a],n=a.length,done=new Set(),mk=o=>{const m={};done.forEach(i=>m[i]='sorted');return Object.assign(m,o)};
+   const sift=(i,size,ln)=>{for(;;){const l=2*i+1,r=l+1;let m=i;if(l<size&&a[l]>a[m])m=l;if(r<size&&a[r]>a[m])m=r;
+    p({a},mk({[i]:'ptr',...(l<size?{[l]:'cmp'}:{}),...(r<size?{[r]:'cmp'}:{})}),ln,`Compare parent a[${i}]=${a[i]} with its children.`);
+    if(m===i)break;[a[i],a[m]]=[a[m],a[i]];p({a},mk({[i]:'swap',[m]:'swap'}),ln,`Larger child wins: swap a[${i}] and a[${m}].`);i=m}};
+   p({a},mk(),1,'Phase 1: rearrange the array into a max-heap (every parent ≥ its children).');
+   for(let i=(n>>1)-1;i>=0;i--)sift(i,n,1);
+   p({a},mk(),1,`Max-heap built: the largest value ${a[0]} sits at index 0.`);
+   for(let e=n-1;e>0;e--){[a[0],a[e]]=[a[e],a[0]];done.add(e);p({a},mk({0:'swap'}),3,`Swap the max ${a[e]} into index ${e}: its final place.`);sift(0,e,4)}
+   done.add(0);p({a},mk(),6,'Sorted!');return{f}}}]},
+
+{id:'shell',g:'Algorithms',name:'Shell Sort',view:'bars',algo:1,desc:'Insertion sort over shrinking gaps, so far-apart items move quickly.',init:[9,4,7,1,8,2,6,3],mk:n=>({a:n.slice(0,16)}),ops:[
+ {k:'run',label:'Run',args:'',cx:'O(n²) worst · depends on the gap sequence',code:[`function shellSort(a) {`,`  for (let gap = a.length >> 1; gap > 0; gap >>= 1) {`,`    for (let i = gap; i < a.length; i++) {`,`      const t = a[i];`,`      let j = i;`,`      for (; j >= gap && a[j-gap] > t; j -= gap)`,`        a[j] = a[j-gap];`,`      a[j] = t;`,`    }`,`  }`,`}`],
+  gen(s){const[f,p]=rec(),a=[...s.a],n=a.length;
+   for(let gap=n>>1;gap>0;gap>>=1){p({a},{},1,`Gap = ${gap}: insertion-sort the elements that are ${gap} apart.`);
+    for(let i=gap;i<n;i++){const t=a[i];let j=i;p({a},{[i]:'pivot',[i-gap]:'cmp'},5,`Compare a[${i}]=${t} with a[${i-gap}]=${a[i-gap]}.`);
+     while(j>=gap&&a[j-gap]>t){a[j]=a[j-gap];p({a},{[j]:'swap',[j-gap]:'cmp'},6,`${a[j]} > ${t}: shift it ${gap} places right.`);j-=gap}
+     if(j!==i){a[j]=t;p({a},{[j]:'new'},7,`Drop ${t} into index ${j}.`)}}}
+   const m={};for(let i=0;i<n;i++)m[i]='sorted';p({a},m,10,'Sorted!');return{f}}}]},
+
+{id:'bfs',g:'Algorithms',name:'Breadth-First Search',view:'graph',algo:1,fixed:1,desc:'Explore a graph level by level using a queue.',init:[],mk:()=>({g:1}),ops:[
+ {k:'run',label:'Run',args:'v',vl:'Start node',vd:0,cx:'O(V + E)',code:[`function bfs(graph, start) {`,`  const seen = new Set([start]), queue = [start];`,`  while (queue.length) {`,`    const u = queue.shift();   // visit`,`    for (const w of graph[u]) {`,`      if (seen.has(w)) continue;`,`      seen.add(w); queue.push(w);`,`    }`,`  }`,`}`],
+  gen(s,{v}){const[f,p]=rec(),st=Math.max(0,Math.min(6,Math.round(v))),adj=ADJ(),seen=new Set([st]),q=[st],ord=[],m={};
+   const snap=(mm,ln,tx)=>p({t:{},q:[...q],ql:'Queue'},{...m,...mm},ln,tx);m[st]='ptr';snap({},1,`Start at node ${st}: mark it visited and enqueue it.`);
+   while(q.length){const u=q.shift();ord.push(u);snap({[u]:'cur'},3,`Dequeue ${u} and visit it. Order so far: ${ord.join(' → ')}.`);
+    for(const[w,e]of adj[u]){if(seen.has(w)){snap({[u]:'cur',['e'+e]:'cmp'},5,`${w} was already discovered; skip it.`);continue}
+     seen.add(w);q.push(w);m[w]='ptr';m['e'+e]='found';snap({[u]:'cur'},6,`Discover ${w}: mark it and enqueue it.`)}
+    m[u]='sorted'}
+   snap({},9,`BFS complete. Visit order: ${ord.join(' → ')}.`);return{f}}}]},
+
+{id:'dfs',g:'Algorithms',name:'Depth-First Search',view:'graph',algo:1,fixed:1,desc:'Dive as deep as possible along each branch, then backtrack.',init:[],mk:()=>({g:1}),ops:[
+ {k:'run',label:'Run',args:'v',vl:'Start node',vd:0,cx:'O(V + E)',code:[`function dfs(graph, u, seen = new Set()) {`,`  seen.add(u);   // visit`,`  for (const w of graph[u])`,`    if (!seen.has(w)) dfs(graph, w, seen);`,`}`],
+  gen(s,{v}){const[f,p]=rec(),st=Math.max(0,Math.min(6,Math.round(v))),adj=ADJ(),seen=new Set(),ord=[],stk=[],m={};
+   const snap=(mm,ln,tx)=>p({t:{},q:[...stk],ql:'Call stack'},{...m,...mm},ln,tx);
+   const go=(u,e)=>{seen.add(u);ord.push(u);stk.push(u);m[u]='cur';if(e!==undefined)m['e'+e]='found';snap({},1,`Visit ${u} and push it on the call stack. Order: ${ord.join(' → ')}.`);
+    for(const[w,k]of adj[u]){if(seen.has(w)){snap({['e'+k]:'cmp'},3,`${w} is already visited; skip.`);continue}snap({['e'+k]:'cmp'},3,`Go deeper: ${u} → ${w}.`);go(w,k);m[u]='cur';snap({},2,`Back at ${u}; look for another unvisited neighbour.`)}
+    stk.pop();m[u]='sorted';snap({},4,`Node ${u} is fully explored; backtrack.`)};
+   go(st);snap({},4,`DFS complete. Visit order: ${ord.join(' → ')}.`);return{f}}}]},
+
+{id:'dijkstra',g:'Algorithms',name:'Dijkstra',view:'graph',algo:1,fixed:1,desc:'Shortest paths from a source in a graph with non-negative edge weights. Numbers above nodes are distances.',init:[],mk:()=>({g:1}),ops:[
+ {k:'run',label:'Run',args:'v',vl:'Source node',vd:0,cx:'O(V²) as shown · O(E log V) with a heap',code:[`function dijkstra(graph, src) {`,`  const dist = new Array(n).fill(Infinity);`,`  dist[src] = 0;`,`  while (unvisited.length) {`,`    const u = closestUnvisited(dist);`,`    for (const [w, cost] of graph[u])`,`      if (dist[u] + cost < dist[w])`,`        dist[w] = dist[u] + cost;   // relax`,`    markVisited(u);`,`  }`,`}`],
+  gen(s,{v}){const[f,p]=rec(),n=GN.length,st=Math.max(0,Math.min(n-1,Math.round(v))),adj=ADJ(),dist=GN.map(()=>Infinity),pe={},done=new Set();dist[st]=0;
+   const mk=o=>{const m={};done.forEach(i=>m[i]='sorted');Object.values(pe).forEach(e=>m['e'+e]='found');return Object.assign(m,o)},L=()=>{const o={};dist.forEach((x,i)=>o[i]=x===Infinity?'∞':x);return o},snap=(m,ln,tx)=>p({t:L(),q:null},m,ln,tx);
+   snap(mk({[st]:'ptr'}),2,`All distances start at ∞, except the source ${st} = 0.`);
+   for(;;){let u=-1;dist.forEach((x,i)=>{if(!done.has(i)&&x<Infinity&&(u<0||x<dist[u]))u=i});if(u<0)break;
+    snap(mk({[u]:'cur'}),4,`Closest unvisited node: ${u} (distance ${dist[u]}).`);
+    for(const[w,e,c]of adj[u]){if(done.has(w))continue;const nd=dist[u]+c;
+     snap(mk({[u]:'cur',[w]:'cmp',['e'+e]:'cmp'}),6,`Via ${u}: ${dist[u]} + ${c} = ${nd} vs current ${dist[w]===Infinity?'∞':dist[w]} at node ${w}.`);
+     if(nd<dist[w]){dist[w]=nd;pe[w]=e;snap(mk({[u]:'cur',[w]:'new'}),7,`Shorter path found: dist[${w}] = ${nd}.`)}}
+    done.add(u);snap(mk(),8,`Node ${u} is finalised at distance ${dist[u]}.`)}
+   snap(mk(),10,'Done. Green edges form the shortest-path tree from the source.');return{f}}}]}
+];
+
+/* ---------- app state & player ---------- */
+let item,op,fr=[],ix=0,timer=null;
+let SPD=1;const speed=()=>700/SPD;
+/* ---- code panel: languages + copy ---- */
+const TR={"py":{"array.insert":["def insert(arr, i, v):\n    arr.append(0)   # make room","    for k in range(len(arr) - 1, i, -1):","        arr[k] = arr[k-1]   # shift right","    arr[i] = v",null],"array.delete":["def remove(arr, i):","    for k in range(i, len(arr) - 1):","        arr[k] = arr[k+1]   # shift left","    arr.pop()",null],"array.update":["def update(arr, i, v):","    arr[i] = v   # direct access",null],"array.search":["def index_of(arr, v):","    for i in range(len(arr)):","        if arr[i] == v: return i","    return -1",null],"list.head":["def insert_head(lst, v):","    node = Node(v)","    node.next = lst.head","    lst.head = node",null],"list.tail":["def insert_tail(lst, v):","    node = Node(v)","    if not lst.head: lst.head = node; return","    cur = lst.head","    while cur.next: cur = cur.next","    cur.next = node",null],"list.del":["def remove(lst, v):","    cur, prev = lst.head, None","    while cur and cur.val != v:\n        prev, cur = cur, cur.next","    if not cur: return","    if prev: prev.next = cur.next","    else: lst.head = cur.next",null],"list.find":["def find(lst, v):","    cur = lst.head","    while cur:","        if cur.val == v: return cur","        cur = cur.next",null,"    return None",null],"stack.push":["def push(stack, v):","    if len(stack) == MAX: raise RuntimeError('overflow')","    stack.append(v)   # new top",null],"stack.pop":["def pop(stack):","    if not stack: raise IndexError('underflow')","    return stack.pop()   # remove top",null],"stack.peek":["def peek(stack):","    return stack[-1]",null],"tree.insert":["def insert(node, v):","    if not node: return Node(v)","    if v < node.val: node.left = insert(node.left, v)","    elif v > node.val: node.right = insert(node.right, v)","    return node",null],"tree.search":["def search(node, v):","    if not node: return None","    if v == node.val: return node","    return (search(node.left, v)","            if v < node.val","            else search(node.right, v))",null],"tree.inorder":["def inorder(node, out):","    if not node: return","    inorder(node.left, out)","    out.append(node.val)","    inorder(node.right, out)",null],"queue.enq":["def enqueue(q, v):","    if len(q) == MAX: raise RuntimeError('overflow')","    q.append(v)   # join at the rear",null],"queue.deq":["def dequeue(q):   # q is a collections.deque","    if not q: raise IndexError('underflow')","    return q.popleft()   # leave from the front",null],"queue.peek":["def peek(q):","    return q[0]",null],"hash.ins":["def insert(table, key):","    i = key % len(table)   # hash","    for k in table[i]:","        if k == key: return        # already present","    table[i].append(key)           # chain it",null],"hash.find":["def has(table, key):","    i = key % len(table)","    for k in table[i]:","        if k == key: return True","    return False",null],"hash.del":["def remove(table, key):","    i = key % len(table)","    j = table[i].index(key) if key in table[i] else -1","    if j >= 0: table[i].pop(j)",null],"heap.ins":["def insert(h, v):","    h.append(v)","    i = len(h) - 1","    while i > 0 and h[(i-1) >> 1] > h[i]:","        swap(h, i, (i-1) >> 1)   # sift up","        i = (i-1) >> 1",null,null],"heap.ext":["def extract_min(h):","    mn, last = h[0], h.pop()","    if not h: return mn   # it was the only element","    h[0] = last   # move the last element to the root","    i = 0","    while True:   # sift down","        m = smallest_of(i, 2*i+1, 2*i+2)","        if m == i: break","        swap(h, i, m); i = m",null,"    return mn",null],"heap.peek":["def peek(h):","    return h[0]   # smallest element",null],"linear":["def linear_search(a, target):","    for i in range(len(a)):","        if a[i] == target: return i","    return -1",null],"bsearch":["def binary_search(a, target):","    lo, hi = 0, len(a) - 1","    while lo <= hi:","        mid = lo + ((hi - lo) >> 1)","        if a[mid] == target: return mid","        if a[mid] < target: lo = mid + 1","        else: hi = mid - 1",null,"    return -1",null],"bubble":["def bubble_sort(a):","    for i in range(len(a) - 1):","        swapped = False","        for j in range(len(a) - 1 - i):","            if a[j] > a[j+1]:","                a[j], a[j+1] = a[j+1], a[j]","                swapped = True",null,null,"        if not swapped: break",null,null],"quick":["def quick_sort(a, lo=0, hi=None):\n    if hi is None: hi = len(a) - 1","    if lo >= hi: return","    p = a[hi]","    i = lo","    for j in range(lo, hi):","        if a[j] < p: a[i], a[j] = a[j], a[i]; i += 1",null,"    a[i], a[hi] = a[hi], a[i]   # pivot in place","    quick_sort(a, lo, i - 1)","    quick_sort(a, i + 1, hi)",null],"selection":["def selection_sort(a):","    for i in range(len(a) - 1):","        mn = i","        for j in range(i + 1, len(a)):","            if a[j] < a[mn]: mn = j","        a[i], a[mn] = a[mn], a[i]",null,null],"insertion":["def insertion_sort(a):","    for i in range(1, len(a)):","        key = a[i]","        j = i - 1","        while j >= 0 and a[j] > key:","            a[j+1] = a[j]; j -= 1",null,"        a[j+1] = key",null,null],"merge":["def merge_sort(a, lo=0, hi=None):\n    if hi is None: hi = len(a) - 1","    if lo >= hi: return","    mid = lo + ((hi - lo) >> 1)","    merge_sort(a, lo, mid)","    merge_sort(a, mid + 1, hi)","    merge(a, lo, mid, hi)   # two-pointer merge",null],"heapsort":["def heap_sort(a):","    build_max_heap(a)","    for end in range(len(a) - 1, 0, -1):","        swap(a, 0, end)          # max goes to the back","        sift_down(a, 0, end)     # restore the heap",null,null],"shell":["def shell_sort(a):\n    gap = len(a) >> 1","    while gap > 0:","        for i in range(gap, len(a)):","            t = a[i]","            j = i","            while j >= gap and a[j-gap] > t:","                a[j] = a[j-gap]; j -= gap","            a[j] = t","        gap >>= 1",null,null],"bfs":["def bfs(graph, start):","    seen, queue = {start}, deque([start])","    while queue:","        u = queue.popleft()   # visit","        for w in graph[u]:","            if w in seen: continue","            seen.add(w); queue.append(w)",null,null,null],"dfs":["def dfs(graph, u, seen):","    seen.add(u)   # visit","    for w in graph[u]:","        if w not in seen: dfs(graph, w, seen)",null],"dijkstra":["def dijkstra(graph, src):","    dist = [float('inf')] * n","    dist[src] = 0","    while unvisited:","        u = closest_unvisited(dist)","        for w, cost in graph[u]:","            if dist[u] + cost < dist[w]:","                dist[w] = dist[u] + cost   # relax","        mark_visited(u)",null,null],"deque.pushFront":["def push_front(dq, v):","    dq.appendleft(v)   # front end",null],"deque.pushBack":["def push_back(dq, v):","    dq.append(v)   # back end",null],"deque.popFront":["def pop_front(dq):","    return dq.popleft()   # front end",null],"deque.popBack":["def pop_back(dq):","    return dq.pop()   # back end",null]},"cpp":{"array.insert":["void insert(vector<int>& arr, int i, int v) {\n  arr.push_back(0);   // make room","  for (int k = arr.size() - 1; k > i; k--)","    arr[k] = arr[k-1];   // shift right","  arr[i] = v;","}"],"array.delete":["void remove(vector<int>& arr, int i) {","  for (int k = i; k < (int)arr.size() - 1; k++)","    arr[k] = arr[k+1];   // shift left","  arr.pop_back();","}"],"array.update":["void update(vector<int>& arr, int i, int v) {","  arr[i] = v;   // direct access","}"],"array.search":["int indexOf(vector<int>& arr, int v) {","  for (int i = 0; i < (int)arr.size(); i++)","    if (arr[i] == v) return i;","  return -1;","}"],"list.head":["void insertHead(List& list, int v) {","  Node* node = new Node(v);","  node->next = list.head;","  list.head = node;","}"],"list.tail":["void insertTail(List& list, int v) {","  Node* node = new Node(v);","  if (!list.head) { list.head = node; return; }","  Node* cur = list.head;","  while (cur->next) cur = cur->next;","  cur->next = node;","}"],"list.del":["void remove(List& list, int v) {","  Node *cur = list.head, *prev = nullptr;","  while (cur && cur->val != v) { prev = cur; cur = cur->next; }","  if (!cur) return;","  if (prev) prev->next = cur->next;","  else list.head = cur->next;","}"],"list.find":["Node* find(List& list, int v) {","  Node* cur = list.head;","  while (cur) {","    if (cur->val == v) return cur;","    cur = cur->next;","  }","  return nullptr;","}"],"stack.push":["void push(vector<int>& stack, int v) {","  if (stack.size() == MAX) throw overflow_error(\"overflow\");","  stack.push_back(v);   // new top","}"],"stack.pop":["int pop(vector<int>& stack) {","  if (stack.empty()) throw underflow_error(\"underflow\");","  int top = stack.back();\n  stack.pop_back();   // remove top\n  return top;","}"],"stack.peek":["int peek(vector<int>& stack) {","  return stack.back();   // stack must be non-empty","}"],"tree.insert":["Node* insert(Node* node, int v) {","  if (!node) return new Node(v);","  if (v < node->val) node->left = insert(node->left, v);","  else if (v > node->val) node->right = insert(node->right, v);","  return node;","}"],"tree.search":["Node* search(Node* node, int v) {","  if (!node) return nullptr;","  if (v == node->val) return node;","  return v < node->val","    ? search(node->left, v)","    : search(node->right, v);","}"],"tree.inorder":["void inorder(Node* node, vector<int>& out) {","  if (!node) return;","  inorder(node->left, out);","  out.push_back(node->val);","  inorder(node->right, out);","}"],"queue.enq":["void enqueue(queue<int>& q, int v) {","  if (q.size() == MAX) throw overflow_error(\"overflow\");","  q.push(v);   // join at the rear","}"],"queue.deq":["int dequeue(queue<int>& q) {","  if (q.empty()) throw underflow_error(\"underflow\");","  int x = q.front();\n  q.pop();   // leave from the front\n  return x;","}"],"queue.peek":["int peek(queue<int>& q) {","  return q.front();   // queue must be non-empty","}"],"hash.ins":["void insert(vector<vector<int>>& table, int key) {","  int i = key % table.size();   // hash","  for (int k : table[i])","    if (k == key) return;        // already present","  table[i].push_back(key);       // chain it","}"],"hash.find":["bool has(vector<vector<int>>& table, int key) {","  int i = key % table.size();","  for (int k : table[i])","    if (k == key) return true;","  return false;","}"],"hash.del":["void remove(vector<vector<int>>& table, int key) {","  int i = key % table.size();","  auto j = find(table[i].begin(), table[i].end(), key);","  if (j != table[i].end()) table[i].erase(j);","}"],"heap.ins":["void insert(vector<int>& h, int v) {","  h.push_back(v);","  int i = h.size() - 1;","  while (i > 0 && h[(i-1) >> 1] > h[i]) {","    swap(h[i], h[(i-1) >> 1]);   // sift up","    i = (i-1) >> 1;","  }","}"],"heap.ext":["int extractMin(vector<int>& h) {","  int mn = h[0], last = h.back();  h.pop_back();","  if (h.empty()) return mn;   // it was the only element","  h[0] = last;   // move the last element to the root","  int i = 0;","  while (true) {   // sift down","    int m = smallestOf(i, 2*i+1, 2*i+2);","    if (m == i) break;","    swap(h[i], h[m]); i = m;","  }","  return mn;","}"],"heap.peek":["int peek(vector<int>& h) {","  return h[0];   // smallest element (heap must be non-empty)","}"],"linear":["int linearSearch(vector<int>& a, int target) {","  for (int i = 0; i < (int)a.size(); i++)","    if (a[i] == target) return i;","  return -1;","}"],"bsearch":["int binarySearch(vector<int>& a, int target) {","  int lo = 0, hi = a.size() - 1;","  while (lo <= hi) {","    int mid = lo + ((hi - lo) >> 1);","    if (a[mid] == target) return mid;","    if (a[mid] < target) lo = mid + 1;","    else hi = mid - 1;","  }","  return -1;","}"],"bubble":["void bubbleSort(vector<int>& a) {","  for (int i = 0; i < (int)a.size() - 1; i++) {","    bool swapped = false;","    for (int j = 0; j < (int)a.size() - 1 - i; j++) {","      if (a[j] > a[j+1]) {","        swap(a[j], a[j+1]);","        swapped = true;","      }","    }","    if (!swapped) break;","  }","}"],"quick":["void quickSort(vector<int>& a, int lo, int hi) {","  if (lo >= hi) return;","  int p = a[hi];","  int i = lo;","  for (int j = lo; j < hi; j++) {","    if (a[j] < p) { swap(a[i], a[j]); i++; }","  }","  swap(a[i], a[hi]);   // pivot in place","  quickSort(a, lo, i - 1);","  quickSort(a, i + 1, hi);","}"],"selection":["void selectionSort(vector<int>& a) {","  for (int i = 0; i < (int)a.size() - 1; i++) {","    int mn = i;","    for (int j = i + 1; j < (int)a.size(); j++)","      if (a[j] < a[mn]) mn = j;","    swap(a[i], a[mn]);","  }","}"],"insertion":["void insertionSort(vector<int>& a) {","  for (int i = 1; i < (int)a.size(); i++) {","    int key = a[i];","    int j = i - 1;","    while (j >= 0 && a[j] > key) {","      a[j+1] = a[j]; j--;","    }","    a[j+1] = key;","  }","}"],"merge":["void mergeSort(vector<int>& a, int lo, int hi) {","  if (lo >= hi) return;","  int mid = lo + ((hi - lo) >> 1);","  mergeSort(a, lo, mid);","  mergeSort(a, mid + 1, hi);","  merge(a, lo, mid, hi);   // two-pointer merge","}"],"heapsort":["void heapSort(vector<int>& a) {","  buildMaxHeap(a);","  for (int end = a.size() - 1; end > 0; end--) {","    swap(a[0], a[end]);       // max goes to the back","    siftDown(a, 0, end);      // restore the heap","  }","}"],"shell":["void shellSort(vector<int>& a) {","  for (int gap = a.size() >> 1; gap > 0; gap >>= 1) {","    for (int i = gap; i < (int)a.size(); i++) {","      int t = a[i];","      int j = i;","      for (; j >= gap && a[j-gap] > t; j -= gap)","        a[j] = a[j-gap];","      a[j] = t;","    }","  }","}"],"bfs":["void bfs(vector<vector<int>>& graph, int start) {","  set<int> seen = {start};  queue<int> q;  q.push(start);","  while (!q.empty()) {","    int u = q.front(); q.pop();   // visit","    for (int w : graph[u]) {","      if (seen.count(w)) continue;","      seen.insert(w); q.push(w);","    }","  }","}"],"dfs":["void dfs(vector<vector<int>>& graph, int u, set<int>& seen) {","  seen.insert(u);   // visit","  for (int w : graph[u])","    if (!seen.count(w)) dfs(graph, w, seen);","}"],"dijkstra":["void dijkstra(vector<vector<pair<int,int>>>& graph, int src) {","  vector<int> dist(n, INT_MAX);","  dist[src] = 0;","  while (!unvisited.empty()) {","    int u = closestUnvisited(dist);","    for (auto [w, cost] : graph[u])","      if (dist[u] + cost < dist[w])","        dist[w] = dist[u] + cost;   // relax","    markVisited(u);","  }","}"],"deque.pushFront":["void pushFront(deque<int>& dq, int v) {","  dq.push_front(v);   // front end","}"],"deque.pushBack":["void pushBack(deque<int>& dq, int v) {","  dq.push_back(v);   // back end","}"],"deque.popFront":["int popFront(deque<int>& dq) {","  int x = dq.front();\n  dq.pop_front();   // front end\n  return x;","}"],"deque.popBack":["int popBack(deque<int>& dq) {","  int x = dq.back();\n  dq.pop_back();   // back end\n  return x;","}"]},"java":{"array.insert":["static void insert(List<Integer> arr, int i, int v) {\n  arr.add(0);   // make room","  for (int k = arr.size() - 1; k > i; k--)","    arr.set(k, arr.get(k-1));   // shift right","  arr.set(i, v);","}"],"array.delete":["static void remove(List<Integer> arr, int i) {","  for (int k = i; k < arr.size() - 1; k++)","    arr.set(k, arr.get(k+1));   // shift left","  arr.remove(arr.size() - 1);","}"],"array.update":["static void update(List<Integer> arr, int i, int v) {","  arr.set(i, v);   // direct access","}"],"array.search":["static int indexOf(List<Integer> arr, int v) {","  for (int i = 0; i < arr.size(); i++)","    if (arr.get(i) == v) return i;","  return -1;","}"],"list.head":["static void insertHead(LinkedList list, int v) {","  Node node = new Node(v);","  node.next = list.head;","  list.head = node;","}"],"list.tail":["static void insertTail(LinkedList list, int v) {","  Node node = new Node(v);","  if (list.head == null) { list.head = node; return; }","  Node cur = list.head;","  while (cur.next != null) cur = cur.next;","  cur.next = node;","}"],"list.del":["static void remove(LinkedList list, int v) {","  Node cur = list.head, prev = null;","  while (cur != null && cur.val != v) { prev = cur; cur = cur.next; }","  if (cur == null) return;","  if (prev != null) prev.next = cur.next;","  else list.head = cur.next;","}"],"list.find":["static Node find(LinkedList list, int v) {","  Node cur = list.head;","  while (cur != null) {","    if (cur.val == v) return cur;","    cur = cur.next;","  }","  return null;","}"],"stack.push":["static void push(Deque<Integer> stack, int v) {","  if (stack.size() == MAX) throw new IllegalStateException(\"overflow\");","  stack.push(v);   // new top","}"],"stack.pop":["static int pop(Deque<Integer> stack) {","  if (stack.isEmpty()) throw new IllegalStateException(\"underflow\");","  return stack.pop();   // remove top","}"],"stack.peek":["static int peek(Deque<Integer> stack) {","  return stack.getFirst();","}"],"tree.insert":["static Node insert(Node node, int v) {","  if (node == null) return new Node(v);","  if (v < node.val) node.left = insert(node.left, v);","  else if (v > node.val) node.right = insert(node.right, v);","  return node;","}"],"tree.search":["static Node search(Node node, int v) {","  if (node == null) return null;","  if (v == node.val) return node;","  return v < node.val","    ? search(node.left, v)","    : search(node.right, v);","}"],"tree.inorder":["static void inorder(Node node, List<Integer> out) {","  if (node == null) return;","  inorder(node.left, out);","  out.add(node.val);","  inorder(node.right, out);","}"],"queue.enq":["static void enqueue(Queue<Integer> q, int v) {","  if (q.size() == MAX) throw new IllegalStateException(\"overflow\");","  q.offer(v);   // join at the rear","}"],"queue.deq":["static int dequeue(Queue<Integer> q) {","  if (q.isEmpty()) throw new IllegalStateException(\"underflow\");","  return q.poll();   // leave from the front","}"],"queue.peek":["static int peek(Queue<Integer> q) {","  return q.element();","}"],"hash.ins":["static void insert(List<List<Integer>> table, int key) {","  int i = key % table.size();   // hash","  for (int k : table.get(i))","    if (k == key) return;        // already present","  table.get(i).add(key);         // chain it","}"],"hash.find":["static boolean has(List<List<Integer>> table, int key) {","  int i = key % table.size();","  for (int k : table.get(i))","    if (k == key) return true;","  return false;","}"],"hash.del":["static void remove(List<List<Integer>> table, int key) {","  int i = key % table.size();","  int j = table.get(i).indexOf(key);","  if (j >= 0) table.get(i).remove(j);","}"],"heap.ins":["static void insert(List<Integer> h, int v) {","  h.add(v);","  int i = h.size() - 1;","  while (i > 0 && h.get((i-1) >> 1) > h.get(i)) {","    Collections.swap(h, i, (i-1) >> 1);   // sift up","    i = (i-1) >> 1;","  }","}"],"heap.ext":["static int extractMin(List<Integer> h) {","  int min = h.get(0), last = h.remove(h.size() - 1);","  if (h.isEmpty()) return min;   // it was the only element","  h.set(0, last);   // move the last element to the root","  int i = 0;","  while (true) {   // sift down","    int m = smallestOf(i, 2*i+1, 2*i+2);","    if (m == i) break;","    Collections.swap(h, i, m); i = m;","  }","  return min;","}"],"heap.peek":["static int peek(List<Integer> h) {","  return h.get(0);   // smallest element","}"],"linear":["static int linearSearch(int[] a, int target) {","  for (int i = 0; i < a.length; i++)","    if (a[i] == target) return i;","  return -1;","}"],"bsearch":["static int binarySearch(int[] a, int target) {","  int lo = 0, hi = a.length - 1;","  while (lo <= hi) {","    int mid = lo + ((hi - lo) >> 1);","    if (a[mid] == target) return mid;","    if (a[mid] < target) lo = mid + 1;","    else hi = mid - 1;","  }","  return -1;","}"],"bubble":["static void bubbleSort(int[] a) {","  for (int i = 0; i < a.length - 1; i++) {","    boolean swapped = false;","    for (int j = 0; j < a.length - 1 - i; j++) {","      if (a[j] > a[j+1]) {","        int t = a[j]; a[j] = a[j+1]; a[j+1] = t;","        swapped = true;","      }","    }","    if (!swapped) break;","  }","}"],"quick":["static void quickSort(int[] a, int lo, int hi) {","  if (lo >= hi) return;","  int p = a[hi];","  int i = lo;","  for (int j = lo; j < hi; j++) {","    if (a[j] < p) { swap(a, i, j); i++; }","  }","  swap(a, i, hi);   // pivot in place","  quickSort(a, lo, i - 1);","  quickSort(a, i + 1, hi);","}"],"selection":["static void selectionSort(int[] a) {","  for (int i = 0; i < a.length - 1; i++) {","    int min = i;","    for (int j = i + 1; j < a.length; j++)","      if (a[j] < a[min]) min = j;","    swap(a, i, min);","  }","}"],"insertion":["static void insertionSort(int[] a) {","  for (int i = 1; i < a.length; i++) {","    int key = a[i];","    int j = i - 1;","    while (j >= 0 && a[j] > key) {","      a[j+1] = a[j]; j--;","    }","    a[j+1] = key;","  }","}"],"merge":["static void mergeSort(int[] a, int lo, int hi) {","  if (lo >= hi) return;","  int mid = lo + ((hi - lo) >> 1);","  mergeSort(a, lo, mid);","  mergeSort(a, mid + 1, hi);","  merge(a, lo, mid, hi);   // two-pointer merge","}"],"heapsort":["static void heapSort(int[] a) {","  buildMaxHeap(a);","  for (int end = a.length - 1; end > 0; end--) {","    swap(a, 0, end);          // max goes to the back","    siftDown(a, 0, end);      // restore the heap","  }","}"],"shell":["static void shellSort(int[] a) {","  for (int gap = a.length >> 1; gap > 0; gap >>= 1) {","    for (int i = gap; i < a.length; i++) {","      int t = a[i];","      int j = i;","      for (; j >= gap && a[j-gap] > t; j -= gap)","        a[j] = a[j-gap];","      a[j] = t;","    }","  }","}"],"bfs":["static void bfs(List<List<Integer>> graph, int start) {","  Set<Integer> seen = new HashSet<>(List.of(start));  Queue<Integer> queue = new ArrayDeque<>(List.of(start));","  while (!queue.isEmpty()) {","    int u = queue.poll();   // visit","    for (int w : graph.get(u)) {","      if (seen.contains(w)) continue;","      seen.add(w); queue.offer(w);","    }","  }","}"],"dfs":["static void dfs(List<List<Integer>> graph, int u, Set<Integer> seen) {","  seen.add(u);   // visit","  for (int w : graph.get(u))","    if (!seen.contains(w)) dfs(graph, w, seen);","}"],"dijkstra":["static void dijkstra(List<List<int[]>> graph, int src) {","  int[] dist = new int[n];  Arrays.fill(dist, Integer.MAX_VALUE);","  dist[src] = 0;","  while (!unvisited.isEmpty()) {","    int u = closestUnvisited(dist);","    for (int[] e : graph.get(u))","      if (dist[u] + e[1] < dist[e[0]])","        dist[e[0]] = dist[u] + e[1];   // relax","    markVisited(u);","  }","}"],"deque.pushFront":["static void pushFront(Deque<Integer> dq, int v) {","  dq.addFirst(v);   // front end","}"],"deque.pushBack":["static void pushBack(Deque<Integer> dq, int v) {","  dq.addLast(v);   // back end","}"],"deque.popFront":["static int popFront(Deque<Integer> dq) {","  return dq.removeFirst();   // front end","}"],"deque.popBack":["static int popBack(Deque<Integer> dq) {","  return dq.removeLast();   // back end","}"]}};
+P.copy='<rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>';P.check='<path d="M20 6 9 17l-5-5"/>';
+const LANGS=[["py","Python","py"],["js","JavaScript","js"],["java","Java","java"],["cpp","C++","cpp"]];
+let lang="py";try{lang=localStorage.getItem("lang")||"py"}catch(e){}if(!LANGS.some(l=>l[0]===lang))lang="py";
+const lnFor=ln=>{if(ln<0)return -1;const c=codeFor();let i=Math.min(ln,c.length-1);while(i>0&&c[i]==null)i--;return i};   // lines with no counterpart (e.g. closing braces in Python) highlight the nearest line above
+const codeFor=()=>{const k=item.id+(item.algo?"":"."+op.k);return lang!=="js"&&TR[lang]&&TR[lang][k]||op.code};
+function renderCode(){const c=codeFor(),js=c===op.code,L=LANGS.find(l=>l[0]===lang);let n=0;
+  $("#code").innerHTML=c.map((t,i)=>{if(t==null)return"";const nums=t.split("\n").map(()=>++n).join("\n");return`<div class="ln" data-i="${i}"><span>${nums}</span><code class="t">${hl(t,js?"js":lang)}</code></div>`}).join("");
+  if(js&&c.some(t=>t&&/\.(un)?shift\(/.test(t)))$("#code").insertAdjacentHTML("beforeend",'<div class="note">In JavaScript, <code>Array.shift()</code>/<code>unshift()</code> take O(n) time. The O(1) bound assumes a real queue or deque (linked list or ring buffer), as in the other languages.</div>');
+  $("#fn").textContent=(c[0].match(/(\w+)\(/)||[0,"code"])[1]+"."+(js?"js":L[2])+(js&&lang!=="js"?" · JS only":"");
+  const f=fr[ix];if(f)document.querySelectorAll(".ln").forEach(l=>l.classList.toggle("on",+l.dataset.i===lnFor(f.ln)))}
+$("#lg").innerHTML=LANGS.map(l=>`<button data-l="${l[0]}" class="${l[0]===lang?"on":""}">${l[1]}</button>`).join("");
+$("#lg").onclick=e=>{const b=e.target.closest("button");if(!b)return;lang=b.dataset.l;try{localStorage.setItem("lang",lang)}catch(_){}
+  document.querySelectorAll("#lg button").forEach(x=>x.classList.toggle("on",x===b));renderCode()};
+const cpIdle=()=>ic("copy",14)+"Copy";$("#cp").innerHTML=cpIdle();
+$("#cp").onclick=async()=>{const t=codeFor().filter(x=>x!=null).join("\n"),b=$("#cp");
+  try{await navigator.clipboard.writeText(t)}catch(e){const a=document.createElement("textarea");a.value=t;a.style.position="fixed";a.style.opacity="0";document.body.appendChild(a);a.select();try{document.execCommand("copy")}catch(_){}a.remove()}
+  b.innerHTML=ic("check",14)+"Copied";clearTimeout(b._t);b._t=setTimeout(()=>b.innerHTML=cpIdle(),1500)};
+function nav(){let g="";$("#nav").innerHTML=ITEMS.map(it=>{const h=it.g!==g?`<div class="sec">${(g=it.g)}</div>`:"";return`${h}<button class="nav" data-id="${it.id}">${ic(IC[it.id])}${it.name}</button>`}).join("")}
+function pick(id){pause();item=ITEMS.find(x=>x.id===id);fr=[];item.s=item.mk(item.init);
+  document.querySelectorAll('.nav').forEach(b=>b.classList.toggle('on',b.dataset.id===id));
+  try{if(location.hash.slice(1)!==id)location.hash=id}catch(e){}
+  $('#pre').style.display=item.algo&&!item.fixed?'':'none';$('#rnd').style.display=item.algo?'none':'';$('#data').closest('.grp').style.display=item.fixed?'none':'';
+  const nv=document.querySelector('.nav.on');if(nv&&nv.scrollIntoView)nv.scrollIntoView({block:'nearest',inline:'center'});
+  $("#title").textContent=item.name;$("#desc").textContent=item.desc;$("#data").value=item.init.join(", ");
+  $("#ops").innerHTML=item.algo?"":item.ops.map(o=>`<button class="chip" data-k="${o.k}">${o.label}</button>`).join("");
+  $("#run").style.display=item.algo?"none":"";pickOp(item.ops[0].k)}
+function pickOp(k){pause();op=item.ops.find(o=>o.k===k);
+  document.querySelectorAll(".chip").forEach(b=>b.classList.toggle("on",b.dataset.k===k));
+  $("#lv").style.display=op.args.includes("v")?"":"none";$("#li").style.display=op.args.includes("i")?"":"none";
+  $("#lv").firstChild.textContent=op.vl||"Value";if(op.vd!==undefined)$("#v").value=op.vd;
+  $("#cx").textContent=op.cx;renderCode();
+  item.algo?load(op.gen(item.s,args())):ready()}
+function args(){const v=parseFloat($("#v").value),i=parseInt($("#i").value,10);return{v:isNaN(v)?0:v,i:isNaN(i)?0:i}}
+function ready(){load({f:[{d:item.s,m:{},ln:-1,t:"Ready. Choose an operation, set its inputs and press Run."}]})}
+function load(r){fr=r.f;ix=0;$("#log").innerHTML=fr.map((x,i)=>`<li data-i="${i}"><span>${i+1}</span>${esc(x.t)}</li>`).join("");draw()}
+function draw(){const f=fr[ix];$("#stage").innerHTML=VIEWS[item.view](f.d,f.m);$("#say").textContent=f.t;
+  document.querySelectorAll(".ln").forEach(l=>l.classList.toggle("on",+l.dataset.i===lnFor(f.ln)));
+  const lg=$("#log");lg.querySelectorAll("li").forEach((l,i)=>{l.classList.toggle("on",i===ix);if(i===ix)lg.scrollTop=l.offsetTop-lg.clientHeight/2});
+  const sc=$("#sc");sc.max=Math.max(fr.length-1,0);sc.value=ix;sc.style.setProperty("--p",(fr.length>1?ix/(fr.length-1)*100:0)+"%");$("#cnt").textContent=`${ix+1} / ${fr.length}`;$("#stp").textContent=`Step ${ix+1}`;$("#pp").innerHTML=ic(timer?"pause":"play",18)}
+function go(i,q){const o=ix;ix=Math.max(0,Math.min(fr.length-1,i));draw();if(!q&&ix!==o)sfx(fr[ix],ix===fr.length-1)}
+function pause(){clearInterval(timer);timer=null;if(fr.length)draw()}
+function play(){if(timer)return pause();if(ix>=fr.length-1)ix=0;
+  timer=setInterval(()=>{if(ix>=fr.length-1)return pause();go(ix+1)},speed());draw()}
+function run(){pause();const r=op.gen(item.s,args());if(r.s)item.s=r.s;load(r);if(fr.length>1)play()}
+function setData(){pause();const raw=$('#data').value.split(/[,\s]+/).filter(Boolean),n=raw.map(Number).filter(Number.isFinite);if(n.length<raw.length){const k=raw.length-n.length;toast(`Ignored ${k} non-numeric ${k>1?'entries':'entry'}.`)}$('#data').value=n.join(', ');
+  item.s=item.mk(n);item.algo?load(op.gen(item.s,args())):ready()}
+
+nav();
+/* ---------- sound (Web Audio, no assets) ---------- */
+let AC=null,on=true;try{on=localStorage.getItem("snd")!=="0"}catch(e){}
+function wake(){if(!on)return;try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();if(AC.state==="suspended")AC.resume()}catch(e){}}
+addEventListener("pointerdown",wake);addEventListener("keydown",wake);
+function tone(f,t,d,type,v){if(!AC)return;const o=AC.createOscillator(),g=AC.createGain(),s=AC.currentTime+t;o.type=type;o.frequency.setValueAtTime(f,s);g.gain.setValueAtTime(0,s);g.gain.linearRampToValueAtTime(v,s+.008);g.gain.exponentialRampToValueAtTime(.0001,s+d);o.connect(g);g.connect(AC.destination);o.start(s);o.stop(s+d+.02)}
+function sfx(f,last){if(!on||!AC)return;const m=f.m,ks=Object.keys(m),has=c=>ks.find(k=>m[k]===c);
+  const fq=k=>item.view==="bars"&&f.d.a?200+Math.abs(f.d.a[k])/Math.max(...f.d.a.map(Math.abs),1)*700:260+((parseInt(k)||0)%12)*45;
+  if(last&&(has("sorted")!==undefined||has("found")!==undefined||has("new")!==undefined)){[523,659,784,1047].forEach((x,i)=>tone(x,i*.09,.22,"triangle",.1));return}
+  const sw=has("swap"),dl=has("del"),nw=has("new"),fd=has("found"),cm=["cmp","cur","mid","ptr","pivot"].map(has).find(x=>x!==undefined);
+  if(sw!==undefined)tone(fq(sw),0,.12,"square",.06);
+  else if(dl!==undefined)tone(150,0,.16,"sawtooth",.07);
+  else if(nw!==undefined)tone(fq(nw),0,.14,"triangle",.12);
+  else if(fd!==undefined){tone(fq(fd),0,.12,"triangle",.1);tone(fq(fd)*1.5,.07,.15,"triangle",.1)}
+  else if(cm!==undefined)tone(fq(cm),0,.07,"sine",.1)}
+const setSnd=v=>{on=v;$("#snd").innerHTML=ic(v?"volume-2":"volume-x");try{localStorage.setItem("snd",v?"1":"0")}catch(e){}};
+setSnd(on);$("#snd").onclick=()=>{setSnd(!on);if(on){wake();sfx({m:{0:"cmp"},d:{a:[5]}},false)}};
+
+$("#nav").onclick=e=>{const b=e.target.closest(".nav");if(b)pick(b.dataset.id)};
+$("#ops").onclick=e=>{const b=e.target.closest(".chip");if(b)pickOp(b.dataset.k)};
+document.body.insertAdjacentHTML('beforeend','<div id="toast" role="status"></div><div id="pal" hidden><div class="pbox"><input id="pq" type="text" placeholder="Jump to a data structure or algorithm…" autocomplete="off" spellcheck="false"><ul id="pl"></ul></div></div>');
+$('.main').insertAdjacentHTML('beforeend','<p class="hint"><kbd>Space</kbd> play · <kbd>←</kbd><kbd>→</kbd> step · <kbd>R</kbd> reset · <kbd id="kh">Ctrl K</kbd> search</p>');
+if(/Mac|iPhone|iPad/.test(navigator.platform))$('#kk').textContent=$('#kh').textContent='⌘K';
+let tt;const toast=m=>{const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('on'),2600)};
+let pi=0,pf=[];
+function pRender(){const q=$('#pq').value.trim().toLowerCase();pf=ITEMS.filter(x=>(x.name+' '+x.g).toLowerCase().includes(q));pi=Math.min(pi,Math.max(pf.length-1,0));
+  $('#pl').innerHTML=pf.map((x,i)=>`<li data-i='${i}' class='${i===pi?'on':''}'>${ic(IC[x.id])}<b>${x.name}</b><span>${x.g}</span></li>`).join('')||'<li class=none>No matches</li>';const on=$('#pl .on');if(on)on.scrollIntoView({block:'nearest'})}
+const pOpen=()=>{$('#pal').hidden=false;$('#pq').value='';pi=0;pRender();$('#pq').focus()},pClose=()=>{$('#pal').hidden=true};
+$('#pq').oninput=()=>{pi=0;pRender()};
+$('#pq').onkeydown=e=>{if(e.key==='ArrowDown'||e.key==='ArrowUp'){e.preventDefault();if(pf.length){pi=(pi+(e.key==='ArrowDown'?1:-1)+pf.length)%pf.length;pRender()}}else if(e.key==='Enter'&&pf[pi]){pick(pf[pi].id);pClose()}else if(e.key==='Escape')pClose()};
+$('#pl').onclick=e=>{const l=e.target.closest('li[data-i]');if(l){pick(pf[+l.dataset.i].id);pClose()}};
+$('#pal').onclick=e=>{if(e.target.id==='pal')pClose()};$('#kb').onclick=pOpen;
+addEventListener('keydown',e=>{if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==='k'){e.preventDefault();$('#pal').hidden?pOpen():pClose()}});
+addEventListener('hashchange',()=>{const id=location.hash.slice(1);if(item&&id!==item.id&&ITEMS.some(x=>x.id===id))pick(id)});
+$('#pre').onclick=e=>{const b=e.target.closest('button');if(!b)return;const n=item.init.length,r=()=>1+Math.random()*98|0,a=Array.from({length:n},r);
+  if(b.dataset.p!=='random')a.sort((x,y)=>x-y);if(b.dataset.p==='reversed')a.reverse();
+  if(b.dataset.p==='nearly')for(let k=0;k<2;k++){const x=Math.random()*(n-1)|0;[a[x],a[x+1]]=[a[x+1],a[x]]}
+  $('#data').value=a.join(', ');setData()};
+[$('#v'),$('#i')].forEach(el=>el.onkeydown=e=>{if(e.key==='Enter'&&!item.algo)run()});
+$("#run").onclick=run;$("#set").onclick=setData;$("#data").onchange=setData;
+$("#rnd").onclick=()=>{const n=6;$("#data").value=Array.from({length:n},()=>1+Math.random()*98|0).join(", ");setData()};
+$("#v").onchange=$("#i").onchange=()=>{if(item.algo){pause();load(op.gen(item.s,args()))}};
+$("#pp").onclick=play;$("#fw").onclick=()=>{pause();go(ix+1)};$("#bk").onclick=()=>{pause();go(ix-1)};$("#rs").onclick=()=>{pause();go(0,1)};
+$("#spd").onclick=e=>{const b=e.target.closest("button");if(!b)return;SPD=+b.dataset.s;document.querySelectorAll("#spd button").forEach(x=>x.classList.toggle("on",x===b));if(timer){pause();play()}};
+$("#sc").oninput=e=>{pause();go(+e.target.value,1)};
+$("#log").onclick=e=>{const l=e.target.closest("li");if(l){pause();go(+l.dataset.i)}};
+document.onkeydown=e=>{if(e.ctrlKey||e.metaKey||e.altKey)return;if(/INPUT|TEXTAREA/.test(e.target.tagName)&&e.target.type!=="range")return;
+  if(e.key===" "){e.preventDefault();play()}else if(e.key==="ArrowRight"){e.preventDefault();pause();go(ix+1)}else if(e.key==="ArrowLeft"){e.preventDefault();pause();go(ix-1)}else if(e.key==="r"){pause();go(0,1)}};
+document.onkeyup=e=>{if(e.key===" "&&!/INPUT|TEXTAREA/.test(e.target.tagName))e.preventDefault()};
+let th="dark";try{th=localStorage.getItem("th")||"dark"}catch(e){}
+const setTh=t=>{th=t;document.documentElement.dataset.theme=t;$("#theme").innerHTML=ic(t==="dark"?"sun":"moon");try{localStorage.setItem("th",t)}catch(e){}};
+setTh(th);const swapTh=t=>{const R=document.documentElement;
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches){setTh(t);return}
+  if(document.startViewTransition){document.startViewTransition(()=>setTh(t));return}
+  R.classList.add('tt');setTh(t);setTimeout(()=>R.classList.remove('tt'),350)};
+$('#theme').onclick=()=>swapTh(th==='dark'?'light':'dark');
+document.querySelectorAll("[data-ic]").forEach(e=>e.insertAdjacentHTML("afterbegin",ic(e.dataset.ic)));
+pick(ITEMS.some(x=>x.id===location.hash.slice(1))?location.hash.slice(1):ITEMS[0].id);
+</script>
+</body>
+</html>
